@@ -33,6 +33,9 @@ Keyboard focus, 44px controls, system appearance, and reduced motion are retaine
 
 ## Vercel deployment
 
+Production: https://usage-desk.vercel.app/ on the maintainer’s personal Vercel team.
+The `usage-desk` project is connected to GitHub with Root Directory `website`.
+
 Import the repository with **Root Directory `website`**. The included `vercel.json` selects
 static hosting with no install/build command and output `.`. It adds a content security policy
 and other browser headers. `404.html` provides a missing-page fallback.
@@ -47,7 +50,7 @@ See [Vercel configuration](https://vercel.com/docs/project-configuration/vercel-
 
 1. Commit and push the reviewed source to the existing public repository after maintainer approval. No signed app release is required for source-only distribution.
 2. Keep the static GitHub links and `repository` in `release.json` set to the verified repository URL.
-3. Add the final absolute `og:url`, canonical URL, and absolute `og:image` URL when the domain is known.
+3. Update canonical, Open Graph, robots, and sitemap URLs together if the production domain changes.
 4. Upload only the contents of `website/` excluding `downloads/` and this README to your static host.
 5. Check the source/build actions, brand downloads, mobile layout, theme, FAQ, and privacy links.
 

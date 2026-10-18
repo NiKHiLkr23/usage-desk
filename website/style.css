@@ -209,4 +209,3 @@ h2 { font-size: clamp(30px, 3.5vw, 42px); }
 
 [hidden] { display: none !important; }
 .setup-steps p a { text-decoration: underline; text-underline-offset: 3px; }
-

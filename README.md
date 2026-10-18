@@ -8,6 +8,8 @@ Usage Desk is a local menu bar utility for people who use more than one Codex ac
 See your remaining quotas, when usage windows reset, and any earned resets returned by Codex.
 Select an account in a compact list, or expand the same panel to manage its connection.
 
+[Website](https://usage-desk.vercel.app/) · [Report an issue](https://github.com/NiKHiLkr23/usage-desk/issues)
+
 > **Distribution:** source only. No prebuilt installer is available.
 > Get the source from [GitHub](https://github.com/NiKHiLkr23/usage-desk) and build it on your Mac using the instructions below.
 

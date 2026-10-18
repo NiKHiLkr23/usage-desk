@@ -48,3 +48,11 @@ GitHub CI and Vercel host behavior must be checked after publication; local test
 
 See [README](README.md), [Privacy](docs/PRIVACY.md), [Security](SECURITY.md),
 [Release guide](docs/RELEASING.md), and [Website](website/README.md).
+
+## Publication
+
+Initial source commit `50876f7` was pushed to public `main` using the GitHub noreply identity.
+Vercel production is https://usage-desk.vercel.app/; only the website directory is served.
+The Vercel project is connected to the same GitHub repository. Public HTTP checks cover source-only
+navigation, security headers, Privacy/Brand routes, and unchanged sanitized screenshot bytes.
+No custom domain, signed app installer, authentication data, or production secrets were published.
