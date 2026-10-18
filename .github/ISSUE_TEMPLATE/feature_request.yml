@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest an improvement to Usage Desk.
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the user interaction and any alternatives.
+    validations:
+      required: true

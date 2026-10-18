@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Codex usage, reset times, and accounts. Usage Desk is a free, open-source macOS menu bar app that keeps them one click away.">
+  <meta property="og:title" content="Usage Desk — Codex usage in your menu bar">
+  <meta property="og:description" content="Check Codex quotas, reset times, and accounts from your Mac menu bar. Free and open source.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#ffffff">
+  <title>Usage Desk — Codex usage in your menu bar</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="assets/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/favicon-180.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header shell">
+  <a href="#" class="brand" aria-label="Usage Desk home"><img src="assets/mark-light.svg" class="brand-mark mark-light" width="40" height="31" alt=""><img src="assets/mark-dark.svg" class="brand-mark mark-dark" width="40" height="31" alt=""><span>usage desk</span></a>
+  <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#questions">FAQ</a></nav>
+  <div class="header-actions"><a class="repo-link" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><button class="icon-button theme-toggle" type="button" aria-label="Theme: System. Switch to light mode." title="System theme"><svg class="theme-symbol" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect class="system-icon" x="3" y="4" width="18" height="13" rx="2"/><path class="system-icon" d="M8 21h8m-4-4v4"/><circle class="sun-icon" cx="12" cy="12" r="4"/><path class="sun-icon" d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/><path class="moon-icon" d="M20.5 14a8.5 8.5 0 0 1-10.5-10.5A8.5 8.5 0 1 0 20.5 14Z"/></svg></button></div>
+</header>
+<main id="main">
+  <section class="hero shell" id="the-app" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="hero-platform">For macOS</p>
+      <h1 id="hero-title">Codex usage,<br>one click away.</h1>
+      <p class="hero-description">Check your quotas, reset times, and accounts.<br class="desktop-break"> Right from your menu bar.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="text-link" href="#how-it-works">How it works</a>
+      </div>
+      <p class="build-note">Source only. Requires macOS 14+, Swift 6+, and the Codex CLI.</p>
+    </div>
+    <figure class="product-shot">
+      <div class="product-stage"><img src="assets/usage-light.png" width="492" height="572" alt="Usage Desk on macOS: 35% left in the five-hour window, 90% in the weekly window, and one earned reset. The email is anonymized." fetchpriority="high" decoding="async"></div>
+      <figcaption>Actual macOS app, account details anonymized.</figcaption>
+    </figure>
+  </section>
+
+  <section class="features shell" aria-labelledby="features-title">
+    <h2 id="features-title">A quick check.<br>Then back to work.</h2>
+    <div class="feature-list">
+      <div><h3>See what’s left</h3><p>Five-hour and weekly quotas, with a countdown to each reset.</p></div>
+      <div><h3>Keep accounts together</h3><p>Connect separate OpenAI accounts and choose whose usage to view.</p></div>
+      <div><h3>Find available resets</h3><p>See the earned resets reported by Codex, alongside your usage.</p></div>
+    </div>
+  </section>
+
+  <section class="setup-section" id="how-it-works" aria-labelledby="setup-title">
+    <div class="shell setup-layout">
+      <div class="section-heading"><h2 id="setup-title">Set up once.<br>Check any time.</h2><p>A native Mac app that works with your installed Codex CLI.</p></div>
+      <ol class="setup-steps">
+        <li><h3>Build and open Usage Desk</h3><p>Follow the <a href="#get-started">build instructions</a>. Your signed-in Codex CLI account appears automatically.</p></li>
+        <li><h3>Add your other accounts</h3><p>Choose Add account, select a browser profile, and sign in with OpenAI.</p></li>
+        <li><h3>Check from the menu bar</h3><p>Usage refreshes in the background. Click the menu bar to see the latest.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="privacy-section shell" id="open-source" aria-labelledby="privacy-title">
+    <h2 id="privacy-title">Local by design.<br>Open by default.</h2>
+    <div><p>Account credentials stay on your Mac. Codex connects directly to OpenAI. Usage Desk has no analytics or intermediary server.</p><div class="privacy-links"><a href="privacy.html">Privacy details</a><a href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
+  </section>
+
+  <section class="faq-section shell" id="questions" aria-labelledby="faq-title">
+    <h2 id="faq-title">Before you install.</h2>
+    <div class="faq-list">
+      <details><summary>Can I download an installer?</summary><p>Usage Desk is currently available as source code only. Build it on your Mac using the instructions below. A signed, notarized installer is not available yet.</p></details>
+      <details><summary>What do I need?</summary><p>macOS 14 or later and a recent Codex CLI signed in with a ChatGPT account. Building from source also requires Swift 6 or newer. Chrome is optional.</p></details>
+      <details><summary>Does it show every ChatGPT limit?</summary><p>It shows the usage windows and earned resets returned by Codex. ChatGPT model or feature limits that Codex doesn’t expose won’t appear here.</p></details>
+      <details><summary>Does choosing an account switch Codex too?</summary><p>It selects the usage you’re viewing in Usage Desk. Your active Codex desktop and CLI login stay unchanged.</p></details>
+      <details><summary>Is it free?</summary><p>Yes. The app and its original artwork are MIT licensed. Codex and ChatGPT account plans are separate.</p></details>
+    </div>
+  </section>
+
+  <section class="build-section shell" id="get-started" aria-labelledby="build-title">
+    <div><h2 id="build-title">Build Usage Desk.</h2><p>Currently available as source code.<br>A prebuilt macOS installer is not available yet.</p><a class="button primary" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><p class="build-note">Requires macOS 14+, Swift 6+, and a recent Codex CLI signed in with a ChatGPT account.</p></div>
+    <details class="source-instructions" id="source-instructions" open><summary>Build from source</summary><p>Get the source from <a href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a>, then open the project folder in Terminal and run:</p><pre><code>zsh scripts/build.sh
+open "dist/Usage desk.app"</code></pre><p>Use Xcode Command Line Tools with Swift 6 or newer. The project README covers requirements and account setup.</p></details>
+  </section>
+</main>
+<footer class="site-footer shell"><a href="#" class="brand"><img src="assets/mark-light.svg" class="mark-light" width="29" height="23" alt=""><img src="assets/mark-dark.svg" class="mark-dark" width="29" height="23" alt=""><span>usage desk</span></a><span>Made by <a href="https://nikhilkr.in" target="_blank" rel="noopener noreferrer">Nikhil</a>. MIT licensed.</span><div><a href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><a href="privacy.html">Privacy</a><a href="brand.html">Brand</a></div><p>Independent community project. Not affiliated with OpenAI or Apple.</p></footer>
+
+</body>
+</html>
