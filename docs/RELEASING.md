@@ -31,7 +31,9 @@ under ignored `.local/`, outside the web root.
 
 After maintainer approval, publish the repository with build instructions and configure only the
 `repository` URL in `website/release.json`. Users obtain the source from GitHub and compile it on
-their own Mac. Keep the website explicit about Swift, macOS, and Codex CLI requirements. Do not
+their own Mac. The optional `website/install.sh` automates that local build and user-folder
+installation; it is not a prebuilt installer. Keep the website explicit about Swift, macOS,
+and Codex CLI requirements. Do not
 attach ad-hoc-signed review builds as public installation assets.
 
 ## Future signed and notarized distribution
@@ -69,3 +71,22 @@ Official references:
 Update `CFBundleShortVersionString` and `CFBundleVersion` in `Support/Info.plist`, the protocol
 client version in `CodexClient.swift`, `package.json` / lockfile, release notes, and website metadata
 for each release. Keep the bundle identifier and credential directories stable unless migrating them.
+
+## Maintaining the source installer
+
+`website/install.sh` uses a full `source_commit` SHA rather than executing a moving branch.
+It currently builds commit `9366db3b03b1fde7513e1f317e66e454f6d866d2` (native app version 0.1.0).
+After reviewing and testing a future app source commit, update that pin and the expected commit
+in `scripts/check-installer.mjs`, run the installer scenarios and website checks, and review
+before publishing. The pinned source need not contain the installer itself.
+
+The script installs into `~/Applications`, verifies the local signature before and after copying,
+and refuses existing app paths, including symlinks. It cleans up temporary source and failed
+partial copies. It does not launch the app, install the CLI/toolchain, change authentication,
+remove quarantine attributes, or disable Gatekeeper. It requires network access to GitHub.
+Users need the Codex CLI installed and signed in separately.
+
+Before promoting the command publicly, test on a separate Mac with a supported toolchain and
+verify `/install.sh` serves the reviewed script over HTTPS with plain-text content type. The
+isolated test suite uses synthetic build/network/signature tools; it does not prove a clean-Mac
+build or runtime compatibility. Never substitute an unsigned binary download under this command.

@@ -18,7 +18,9 @@ no bot-specific rules are needed to allow search or answer-engine crawlers.
   source repository. It describes free, source-only distribution and the real requirements.
 - The visible FAQ answers installation, requirements, coverage, multiple accounts, Codex
   login behavior, earned-reset redemption, and cost. All answers are in the HTML.
-- There are no invented reviews, ratings, installer URLs, or claims to show every ChatGPT limit.
+- The source-install command is explicit about local compilation and its prerequisites.
+  `/install.sh` is served as plain text with `noindex`, not listed as a prebuilt download.
+- There are no invented reviews, ratings, binary download URLs, or claims to show every ChatGPT limit.
 - The 404 page is `noindex` and should return HTTP 404.
 - The inline JSON-LD has an exact SHA-256 allowance in the Content Security Policy.
   When editing it, update that hash in `website/vercel.json`. The preview reads the same

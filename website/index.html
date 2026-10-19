@@ -115,18 +115,32 @@
 <main id="main">
   <section class="hero shell" id="the-app" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <p class="hero-platform">For macOS</p>
+      <p class="hero-platform">Native macOS. Free &amp; open source.</p>
       <h1 id="hero-title">Codex usage,<br>one click away.</h1>
       <p class="hero-description">Usage Desk is a free, open-source Mac app for checking Codex quotas, reset times, and multiple accounts.</p>
-      <div class="hero-actions">
-        <a class="button primary" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="text-link" href="#how-it-works">How it works</a>
+      <div class="install-block" data-install-block>
+        <div class="install-command"><span class="command-prompt" aria-hidden="true">$</span><code id="install-command-hero">curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh</code><button class="copy-button" type="button" data-copy-command aria-label="Copy install command" aria-controls="install-command-hero" hidden><svg class="copy-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg><svg class="check-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span data-copy-label>Copy</span></button></div>
+        <p class="copy-feedback visually-hidden" data-copy-feedback role="status" aria-live="polite"></p>
       </div>
-      <p class="build-note">Source only. Requires macOS 14+, Swift 6+, and the Codex CLI.</p>
+      <p class="install-requirements">Builds locally · macOS 14+ · Swift 6+<a href="install.sh" target="_blank" rel="noopener noreferrer">Inspect script</a></p>
+      <div class="hero-actions">
+        <a class="button primary star-link" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg>Star on GitHub</a>
+        <a class="text-link" href="#how-it-works">How it works <span aria-hidden="true">↗</span></a>
+      </div>
+      <p class="build-note">Requires Xcode Command Line Tools and a signed-in Codex CLI.</p>
     </div>
     <figure class="product-shot">
-      <div class="product-stage"><img src="assets/usage-light.png" width="492" height="572" alt="Usage Desk on macOS: 35% left in the five-hour window, 90% in the weekly window, and one earned reset. The email is anonymized." fetchpriority="high" decoding="async"></div>
-      <figcaption>Actual macOS app, account details anonymized.</figcaption>
+      <div class="showcase-tabs" role="tablist" aria-label="Explore Usage Desk" data-showcase-tabs hidden>
+        <button type="button" role="tab" id="preview-tab-usage" aria-selected="true" aria-controls="preview-usage" tabindex="0">Usage</button>
+        <button type="button" role="tab" id="preview-tab-accounts" aria-selected="false" aria-controls="preview-accounts" tabindex="-1">Accounts</button>
+        <button type="button" role="tab" id="preview-tab-resets" aria-selected="false" aria-controls="preview-resets" tabindex="-1">Resets</button>
+      </div>
+      <div class="showcase-viewport">
+        <div role="tabpanel" id="preview-usage" aria-labelledby="preview-tab-usage"><img src="assets/showcase-usage.png" width="840" height="1000" alt="Actual Usage Desk app with sample data: five-hour and weekly Codex quotas, reset countdowns, and an earned reset." fetchpriority="high" decoding="async"></div>
+        <div role="tabpanel" id="preview-accounts" aria-labelledby="preview-tab-accounts" hidden><img src="assets/showcase-accounts.png" width="840" height="1000" alt="Actual Usage Desk Accounts tab with three sample profiles: Current account, Work, and Side projects." decoding="async"></div>
+        <div role="tabpanel" id="preview-resets" aria-labelledby="preview-tab-resets" hidden><img src="assets/showcase-resets.png" width="840" height="1000" alt="Actual Usage Desk Resets tab showing a sample earned reset and its expiration date." decoding="async"></div>
+      </div>
+      <figcaption>Actual macOS app · Sample account data.</figcaption>
     </figure>
   </section>
 
@@ -143,7 +157,7 @@
     <div class="shell setup-layout">
       <div class="section-heading"><h2 id="setup-title">Set up once.<br>Check any time.</h2><p>A native Mac app that works with your installed Codex CLI.</p></div>
       <ol class="setup-steps">
-        <li><h3>Build and open Usage Desk</h3><p>Follow the <a href="#get-started">build instructions</a>. Your signed-in Codex CLI account appears automatically.</p></li>
+        <li><h3>Install Usage Desk</h3><p>Run the <a href="#get-started">source installer</a>, then open the app. Your signed-in Codex CLI account appears automatically.</p></li>
         <li><h3>Add your other accounts</h3><p>Choose Add account, select a browser profile, and sign in with OpenAI.</p></li>
         <li><h3>Check from the menu bar</h3><p>Usage refreshes in the background. Click the menu bar to see the latest.</p></li>
       </ol>
@@ -158,7 +172,7 @@
   <section class="faq-section shell" id="questions" aria-labelledby="faq-title">
     <h2 id="faq-title">Before you install.</h2>
     <div class="faq-list">
-      <details><summary>Can I download an installer?</summary><p>Usage Desk is currently available as source code only. Build it on your Mac using the instructions below. A signed, notarized installer is not available yet.</p></details>
+      <details><summary>Is there a prebuilt app?</summary><p>There is no prebuilt, signed installer yet. The source installer below downloads a pinned source revision, builds Usage Desk on your Mac, and installs it in your home Applications folder. macOS 14+ and Swift 6+ are required.</p></details>
       <details><summary>What do I need?</summary><p>macOS 14 or later and a recent Codex CLI signed in with a ChatGPT account. Building from source also requires Swift 6 or newer. Chrome is optional.</p></details>
       <details><summary>Does it show every ChatGPT limit?</summary><p>It shows the usage windows and earned resets returned by Codex. ChatGPT model or feature limits that Codex doesn’t expose won’t appear here.</p></details>
       <details><summary>Can I monitor multiple Codex accounts?</summary><p>Yes. Connect each OpenAI account separately, optionally choosing a Chrome profile for sign-in, then select whose Codex usage to view. Credentials stay on your Mac.</p></details>
@@ -169,12 +183,40 @@
   </section>
 
   <section class="build-section shell" id="get-started" aria-labelledby="build-title">
-    <div><h2 id="build-title">Build Usage Desk.</h2><p>Currently available as source code.<br>A prebuilt macOS installer is not available yet.</p><a class="button primary" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><p class="build-note">Requires macOS 14+, Swift 6+, and a recent Codex CLI signed in with a ChatGPT account.</p></div>
-    <details class="source-instructions" id="source-instructions" open><summary>Build from source</summary><p>Get the source from <a href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a>, then open the project folder in Terminal and run:</p><pre><code>zsh scripts/build.sh
-open "dist/Usage desk.app"</code></pre><p>Use Xcode Command Line Tools with Swift 6 or newer. The project README covers requirements and account setup.</p></details>
+    <div><h2 id="build-title">Install Usage Desk.</h2><p>Builds on your Mac from source.<br>No prebuilt app download yet.</p><a class="button primary" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><p class="build-note">Requires macOS 14+, Swift 6+, and a recent Codex CLI signed in with a ChatGPT account.</p></div>
+    <details class="source-instructions" id="source-instructions" open><summary>Install from source</summary><p>Run in Terminal. Builds locally and installs into <code>~/Applications</code>. No sudo required.</p><div class="install-block" data-install-block>
+        <div class="install-command"><span class="command-prompt" aria-hidden="true">$</span><code id="install-command-footer">curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh</code><button class="copy-button" type="button" data-copy-command aria-label="Copy install command" aria-controls="install-command-footer" hidden><svg class="copy-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg><svg class="check-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span data-copy-label>Copy</span></button></div>
+        <p class="copy-feedback visually-hidden" data-copy-feedback role="status" aria-live="polite"></p>
+      </div><p>Requires Xcode Command Line Tools with Swift 6 or newer. <a href="install.sh" target="_blank" rel="noopener noreferrer">Inspect the script</a> or follow the <a href="https://github.com/NiKHiLkr23/usage-desk#build-and-run" target="_blank" rel="noopener noreferrer">manual build instructions</a>. Open Usage desk from your home Applications folder after installation.</p></details>
   </section>
 </main>
-<footer class="site-footer shell"><a href="#" class="brand"><img src="assets/mark-light.svg" class="mark-light" width="29" height="23" alt=""><img src="assets/mark-dark.svg" class="mark-dark" width="29" height="23" alt=""><span>usage desk</span></a><span>Made by <a href="https://nikhilkr.in" target="_blank" rel="noopener noreferrer">Nikhil</a>. MIT licensed.</span><div><a href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><a href="privacy.html">Privacy</a><a href="brand.html">Brand</a></div><p>Independent community project. Not affiliated with OpenAI or Apple.</p></footer>
+<footer class="site-footer site-footer--expanded">
+  <div class="shell footer-content">
+    <div class="footer-grid">
+      <div class="footer-intro">
+        <a href="/" class="brand" aria-label="Usage Desk home"><img src="assets/mark-light.svg" class="mark-light" width="34" height="27" alt=""><img src="assets/mark-dark.svg" class="mark-dark" width="34" height="27" alt=""><span>usage desk</span></a>
+        <p class="footer-headline">Your usage.<br>At a glance.</p>
+      </div>
+      <div class="footer-columns">
+        <nav aria-label="Product links"><ul>
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#get-started">Install from source</a></li>
+          <li><a href="#questions">FAQ</a></li>
+        </ul></nav>
+        <nav aria-label="Project links"><ul>
+          <li><a href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="privacy.html">Privacy</a></li>
+          <li><a href="brand.html">Brand assets</a></li>
+        </ul></nav>
+      </div>
+    </div>
+    <div class="footer-baseline">
+      <p>© 2026 Usage Desk</p>
+      <p class="footer-credit">Made by <a href="https://nikhilkr.in" target="_blank" rel="noopener noreferrer">Nikhil</a><span aria-hidden="true">·</span><a href="https://github.com/NiKHiLkr23/usage-desk/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT licensed</a></p>
+    </div>
+  </div>
+  <div class="footer-wordmark" aria-hidden="true">usage desk</div>
+</footer>
 
 </body>
 </html>

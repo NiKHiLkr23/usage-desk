@@ -22,8 +22,11 @@ for(const filename of ['index.html','privacy.html','brand.html','404.html']){
 }
 const html=await read('index.html');
 for(const [,panel]of html.matchAll(/aria-controls="([^"]+)"/g)){assert.ok(html.includes(`id="${panel}"`));checks++}
-assert.ok(html.includes('account details anonymized'));assert.ok(html.includes('assets/usage-light.png'));assert.ok(html.includes('prefers-reduced-motion')||(await read('style.css')).includes('prefers-reduced-motion'));checks+=2;
+assert.ok(html.includes('Actual macOS app · Sample account data.'));assert.ok(html.includes('assets/showcase-usage.png'));assert.ok(html.includes('prefers-reduced-motion')||(await read('style.css')).includes('prefers-reduced-motion'));checks+=2;
 execFileSync(process.execPath,['--check',path.join(site,'app.js')]);checks++;
+execFileSync(process.execPath,[path.join(root,'scripts/check-installer.mjs')],{stdio:'inherit'});checks++;
+assert.ok(html.includes('curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh'));checks++;
+const install=await read('install.sh');assert.match(install,/source_commit=[a-f0-9]{40}/);checks++;
 // Keep the production domain, crawler discovery, and share cards consistent.
 const origin='https://usage-desk.nikhilkr.in';
 const pages=new Map([['index.html','/'],['privacy.html','/privacy.html'],['brand.html','/brand.html']]);

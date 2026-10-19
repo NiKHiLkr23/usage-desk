@@ -33,6 +33,22 @@ Select an account in a compact list, or expand the same panel to manage its conn
 
 ## Build and run
 
+With macOS 14+ and Xcode Command Line Tools providing Swift 6+, run:
+
+```sh
+curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh
+```
+
+[Inspect the installer](https://usage-desk.nikhilkr.in/install.sh) before running it.
+It fetches a pinned source revision from this repository, verifies the commit, builds locally,
+and installs an ad-hoc-signed app into `~/Applications` without sudo. It does not install the
+Codex CLI or sign you in. Open Usage desk from your home Applications folder afterward.
+An existing app is never overwritten; quit it and move it to Trash before reinstalling.
+Your account data is retained. This source installer does not download a prebuilt app or
+provide a notarized distribution build.
+
+To build a checkout manually:
+
 ```sh
 zsh scripts/build.sh
 open "dist/Usage desk.app"
