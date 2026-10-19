@@ -82,11 +82,20 @@ before publishing. The pinned source need not contain the installer itself.
 
 The script installs into `~/Applications`, verifies the local signature before and after copying,
 and refuses existing app paths, including symlinks. It cleans up temporary source and failed
-partial copies. It does not launch the app, install the CLI/toolchain, change authentication,
-remove quarantine attributes, or disable Gatekeeper. It requires network access to GitHub.
+partial copies. It offers to launch the installed app only after an affirmative response from
+a controlling terminal; redirected/non-interactive runs never launch it. It does not install the
+CLI/toolchain, change authentication, remove quarantine attributes, or disable Gatekeeper.
+It requires network access to GitHub.
 Users need the Codex CLI installed and signed in separately.
 
 Before promoting the command publicly, test on a separate Mac with a supported toolchain and
 verify `/install.sh` serves the reviewed script over HTTPS with plain-text content type. The
 isolated test suite uses synthetic build/network/signature tools; it does not prove a clean-Mac
 build or runtime compatibility. Never substitute an unsigned binary download under this command.
+
+The terminal interface uses a text version of the two-windows logo, real phase indicators,
+and a spinner only on capable terminals. `NO_COLOR` disables color. Known compatible terminals
+receive OSC 8 setup hyperlinks; other terminals get the full URL and an `open` command.
+Build details go into a private temporary log, removed on success. On failure the final
+30 log lines and the retained log path are printed; temporary source and partial apps are removed.
+The launch prompt reads `/dev/tty`, never the curl pipeline. No GUI helper is installed.

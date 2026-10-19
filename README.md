@@ -42,7 +42,8 @@ curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh
 [Inspect the installer](https://usage-desk.nikhilkr.in/install.sh) before running it.
 It fetches a pinned source revision from this repository, verifies the commit, builds locally,
 and installs an ad-hoc-signed app into `~/Applications` without sudo. It does not install the
-Codex CLI or sign you in. Open Usage desk from your home Applications folder afterward.
+Codex CLI or sign you in. In an interactive terminal, it offers to open Usage Desk when
+installation finishes. Otherwise, open it from your home Applications folder.
 An existing app is never overwritten; quit it and move it to Trash before reinstalling.
 Your account data is retained. This source installer does not download a prebuilt app or
 provide a notarized distribution build.

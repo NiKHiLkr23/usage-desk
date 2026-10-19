@@ -27,6 +27,10 @@ ZIP is promoted, on localhost or in production.
 revalidation headers. It fetches a fixed public Git commit, verifies it, builds with the
 user's Swift toolchain, and installs into `~/Applications`. It requires macOS 14+ and
 Swift 6+, refuses root and existing apps, and never installs Codex or changes Gatekeeper.
+The terminal flow displays a compact text logo and real build/install phases. Build output
+is saved to a private log, retained with recent details on failure and removed on success.
+Interactive runs offer to open the app via `/dev/tty`; redirected runs never launch it.
+`NO_COLOR`, plain-text link fallbacks, and a manual app-opening path are supported.
 Run `node scripts/check-installer.mjs` for isolated, network-free installer checks.
 
 The optional maintainer command `zsh scripts/package.sh --universal` creates a local review ZIP

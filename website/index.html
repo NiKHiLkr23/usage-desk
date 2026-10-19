@@ -108,7 +108,7 @@
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header shell">
-  <a href="#" class="brand" aria-label="Usage Desk home"><img src="assets/mark-light.svg" class="brand-mark mark-light" width="40" height="31" alt=""><img src="assets/mark-dark.svg" class="brand-mark mark-dark" width="40" height="31" alt=""><span>usage desk</span></a>
+  <a href="#" class="brand" aria-label="Usage Desk home"><img draggable="false" src="assets/mark-light.svg" class="brand-mark mark-light" width="40" height="31" alt=""><img draggable="false" src="assets/mark-dark.svg" class="brand-mark mark-dark" width="40" height="31" alt=""><span>usage desk</span></a>
   <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#questions">FAQ</a></nav>
   <div class="header-actions"><a class="repo-link" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><button class="icon-button theme-toggle" type="button" aria-label="Theme: System. Switch to light mode." title="System theme"><svg class="theme-symbol" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect class="system-icon" x="3" y="4" width="18" height="13" rx="2"/><path class="system-icon" d="M8 21h8m-4-4v4"/><circle class="sun-icon" cx="12" cy="12" r="4"/><path class="sun-icon" d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/><path class="moon-icon" d="M20.5 14a8.5 8.5 0 0 1-10.5-10.5A8.5 8.5 0 1 0 20.5 14Z"/></svg></button></div>
 </header>
@@ -136,9 +136,9 @@
         <button type="button" role="tab" id="preview-tab-resets" aria-selected="false" aria-controls="preview-resets" tabindex="-1">Resets</button>
       </div>
       <div class="showcase-viewport">
-        <div role="tabpanel" id="preview-usage" aria-labelledby="preview-tab-usage"><img src="assets/showcase-usage.png" width="840" height="1000" alt="Actual Usage Desk app with sample data: five-hour and weekly Codex quotas, reset countdowns, and an earned reset." fetchpriority="high" decoding="async"></div>
-        <div role="tabpanel" id="preview-accounts" aria-labelledby="preview-tab-accounts" hidden><img src="assets/showcase-accounts.png" width="840" height="1000" alt="Actual Usage Desk Accounts tab with three sample profiles: Current account, Work, and Side projects." decoding="async"></div>
-        <div role="tabpanel" id="preview-resets" aria-labelledby="preview-tab-resets" hidden><img src="assets/showcase-resets.png" width="840" height="1000" alt="Actual Usage Desk Resets tab showing a sample earned reset and its expiration date." decoding="async"></div>
+        <div role="tabpanel" id="preview-usage" aria-labelledby="preview-tab-usage"><img draggable="false" src="assets/showcase-usage.png" width="840" height="1000" alt="Actual Usage Desk app with sample data: five-hour and weekly Codex quotas, reset countdowns, and an earned reset." fetchpriority="high" decoding="async"></div>
+        <div role="tabpanel" id="preview-accounts" aria-labelledby="preview-tab-accounts" hidden><img draggable="false" src="assets/showcase-accounts.png" width="840" height="1000" alt="Actual Usage Desk Accounts tab with three sample profiles: Current account, Work, and Side projects." decoding="async"></div>
+        <div role="tabpanel" id="preview-resets" aria-labelledby="preview-tab-resets" hidden><img draggable="false" src="assets/showcase-resets.png" width="840" height="1000" alt="Actual Usage Desk Resets tab showing a sample earned reset and its expiration date." decoding="async"></div>
       </div>
       <figcaption>Actual macOS app · Sample account data.</figcaption>
     </figure>
@@ -187,14 +187,14 @@
     <details class="source-instructions" id="source-instructions" open><summary>Install from source</summary><p>Run in Terminal. Builds locally and installs into <code>~/Applications</code>. No sudo required.</p><div class="install-block" data-install-block>
         <div class="install-command"><span class="command-prompt" aria-hidden="true">$</span><code id="install-command-footer">curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh</code><button class="copy-button" type="button" data-copy-command aria-label="Copy install command" aria-controls="install-command-footer" hidden><svg class="copy-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg><svg class="check-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span data-copy-label>Copy</span></button></div>
         <p class="copy-feedback visually-hidden" data-copy-feedback role="status" aria-live="polite"></p>
-      </div><p>Requires Xcode Command Line Tools with Swift 6 or newer. <a href="install.sh" target="_blank" rel="noopener noreferrer">Inspect the script</a> or follow the <a href="https://github.com/NiKHiLkr23/usage-desk#build-and-run" target="_blank" rel="noopener noreferrer">manual build instructions</a>. Open Usage desk from your home Applications folder after installation.</p></details>
+      </div><p>Requires Xcode Command Line Tools with Swift 6 or newer. <a href="install.sh" target="_blank" rel="noopener noreferrer">Inspect the script</a> or follow the <a href="https://github.com/NiKHiLkr23/usage-desk#build-and-run" target="_blank" rel="noopener noreferrer">manual build instructions</a>. At the end, choose to open Usage Desk, or open it from your home Applications folder.</p></details>
   </section>
 </main>
 <footer class="site-footer site-footer--expanded">
   <div class="shell footer-content">
     <div class="footer-grid">
       <div class="footer-intro">
-        <a href="/" class="brand" aria-label="Usage Desk home"><img src="assets/mark-light.svg" class="mark-light" width="34" height="27" alt=""><img src="assets/mark-dark.svg" class="mark-dark" width="34" height="27" alt=""><span>usage desk</span></a>
+        <a href="/" class="brand" aria-label="Usage Desk home"><img draggable="false" src="assets/mark-light.svg" class="mark-light" width="34" height="27" alt=""><img draggable="false" src="assets/mark-dark.svg" class="mark-dark" width="34" height="27" alt=""><span>usage desk</span></a>
         <p class="footer-headline">Your usage.<br>At a glance.</p>
       </div>
       <div class="footer-columns">

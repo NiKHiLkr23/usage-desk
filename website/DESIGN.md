@@ -57,3 +57,9 @@ accounts. No upstream CSS, JavaScript, or artwork was copied.
 
 2026-10-19: Adapted the Hunchlane footer composition from the maintainer’s local reference
 repository. Reimplemented it in static HTML/CSS with Usage Desk assets and tokens.
+
+2026-10-19: Source installer uses a compact two-windows text mark, green success checks,
+real build phases, and a restrained terminal spinner. Keep build noise in a private log with
+visible failure recovery. Offer app launch after installation; never require clickable links
+or an extra GUI dependency. Website images explicitly disable dragging, including logos
+and native product captures; normal links and brand downloads remain available.
