@@ -39,7 +39,16 @@ final class CoffeeMotionTests: XCTestCase {
         }
     }
 
-    @MainActor func testActualButtonAnimatesOnlyWhenOnAndPreservesOneAssertion() {
+    @MainActor func testActualButtonAnimatesOnlyWhenOnAndPreservesOneAssertion() throws {
+        #if arch(x86_64)
+        // The hosted Intel VM aborts inside Metal when SwiftUI Canvas renders:
+        // "Target device architecture is nil". Keep this GPU test on physical
+        // Macs/Apple silicon; geometry, visibility and ownership still run here.
+        if ProcessInfo.processInfo.environment["GITHUB_ACTIONS"] == "true",
+           ProcessInfo.processInfo.environment["RUNNER_ENVIRONMENT"] != "self-hosted" {
+            throw XCTSkip("Hosted Intel Metal device cannot render SwiftUI Canvas; run this check on a Mac with a supported GPU.")
+        }
+        #endif
         _ = NSApplication.shared
         let backend = MotionTestBackend()
         let controller = KeepAwakeController(backend: backend)
@@ -58,7 +67,13 @@ final class CoffeeMotionTests: XCTestCase {
         XCTAssertEqual(off, snapshot(), "Off does not run a background animation")
         controller.setEnabled(true); pumpAppKit(for: 0.2)
         let active = snapshot(); pumpAppKit(for: 0.6)
-        XCTAssertNotEqual(active, snapshot(), "On must move without hover")
+        // Hosted macOS runners can enable Reduce Motion. Never change the user's
+        // preference or expect motion that the actual button must suppress.
+        if NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            XCTAssertEqual(active, snapshot(), "System Reduce Motion keeps the active cup static")
+        } else {
+            XCTAssertNotEqual(active, snapshot(), "On must move without hover when motion is allowed")
+        }
         XCTAssertEqual(backend.created, 1, "Animation cycles must never reacquire an assertion")
         host.rootView = AnyView(CoffeeButton(controller: controller, reduceMotionOverride: true).frame(width: 40, height: 40).background(Color.white))
         pumpAppKit(for: 0.2)
