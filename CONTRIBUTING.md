@@ -7,7 +7,7 @@ first so we can agree on the behavior before you spend time implementing it.
 ## Local setup
 
 Use macOS 14+, Swift 6+, and Xcode Command Line Tools. No Swift package dependencies are required.
-A real Codex CLI or account is not needed to run the ordinary tests.
+A real Codex or Claude CLI/account is not needed to run the ordinary tests.
 
 ```sh
 zsh scripts/build.sh
@@ -27,7 +27,7 @@ open "dist/Usage Desk Demo.app"
 ```
 
 This separate app uses synthetic `example.com` accounts, a separate preferences domain,
-no Chrome profile reads, no Codex connections, and no account-file load or writes.
+no Chrome profile reads, no Codex or Claude connections, and no account-file load or writes.
 Use it to capture real app screenshots without private accounts. Regular builds never enable demo mode by default.
 For an existing real screenshot, permanently redact personal fields and strip metadata before adding it.
 See `assets/screenshots/README.md` and `scripts/sanitize-screenshot.py`; inspect every exported image.
@@ -38,11 +38,13 @@ Do not submit screenshots containing real emails, account IDs, auth links, or to
 These are explicitly opt-in, outside CI:
 
 ```sh
+RESET_DESK_LIVE_CLAUDE=/absolute/path/to/claude swift test --filter LiveReadTests/testSignedInClaudeCanReadUsageWithoutPrompt
 RESET_DESK_LIVE_CODEX=/absolute/path/to/codex swift test --filter LiveReadTests/testSignedInCodexCanReadUsage
 RESET_DESK_LIVE_LOGIN=/absolute/path/to/codex swift test --filter LiveReadTests/testTwoLiveProfilesCanPrepareAndCancelLogin
 ```
 
-The first reads the current local account. The second creates temporary isolated signed-out homes,
+The Claude and Codex usage checks read their selected local profile without sending prompts.
+The login check creates temporary isolated signed-out homes,
 prepares/cancels/retries a login, and never opens a browser or completes OAuth. Neither starts a model turn
 or redeems a reset. Complete real browser sign-in yourself when testing account connection.
 
@@ -60,7 +62,7 @@ SVG sources are editable; exports are committed assets. See [the brand guide](as
 ## Issues
 
 Use the bug or feature template after the repository is public. Include the macOS version, app version,
-architecture, Codex CLI version, and reproduction steps. Sanitize diagnostics. Never attach
+architecture, provider and CLI version, and reproduction steps. Sanitize diagnostics. Never attach
 `auth.json`, `accounts.json`, browser databases, your entire Codex home, or raw sign-in URLs.
 Report suspected security issues [privately](SECURITY.md).
 

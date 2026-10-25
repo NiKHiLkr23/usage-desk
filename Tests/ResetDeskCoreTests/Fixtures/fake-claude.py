@@ -19,7 +19,7 @@ if mode == '-p':
         assert os.environ.get(key) == '1', 'Keep optional reporting and updates disabled'
     for key in ['ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_BASE_URL', 'CLAUDE_CODE_USE_BEDROCK', 'CLAUDE_CODE_USE_VERTEX']:
         assert key not in os.environ
-    mode = 'success' 
+    mode = 'success'
 for line in sys.stdin:
     msg = json.loads(line)
     assert msg['type'] == 'control_request', 'Never send a model prompt'

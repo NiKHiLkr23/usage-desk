@@ -4,26 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Track Codex usage limits, reset countdowns, and multiple OpenAI accounts from your Mac menu bar. Free, open source, and local. Build from source for macOS 14+.">
-  <meta property="og:title" content="Usage Desk — Codex Usage &amp; Reset Tracker for macOS">
-  <meta property="og:description" content="Track Codex usage limits, reset countdowns, and multiple OpenAI accounts from your Mac menu bar. Free, open source, and local. Build from source for macOS 14+.">
+  <meta name="description" content="Track Codex and Claude usage limits, reset times, and multiple accounts from your Mac menu bar. Free, open source, and local. Build from source for macOS 14+.">
+  <meta property="og:title" content="Usage Desk — Codex &amp; Claude Usage Tracker for macOS">
+  <meta property="og:description" content="Track Codex and Claude usage limits, reset times, and multiple accounts from your Mac menu bar. Free, open source, and local. Build from source for macOS 14+.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://usage-desk.nikhilkr.in/">
   <meta property="og:image" content="https://usage-desk.nikhilkr.in/assets/social-preview.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Usage Desk: Codex quotas, reset times, and accounts in your Mac menu bar.">
+  <meta property="og:image:alt" content="Usage Desk: Codex and Claude quotas, reset times, and accounts in your Mac menu bar.">
   <link rel="canonical" href="https://usage-desk.nikhilkr.in/">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta property="og:site_name" content="Usage Desk">
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Usage Desk — Codex Usage &amp; Reset Tracker for macOS">
-  <meta name="twitter:description" content="Track Codex usage limits, reset countdowns, and multiple OpenAI accounts from your Mac menu bar. Free, open source, and local. Build from source for macOS 14+.">
+  <meta name="twitter:title" content="Usage Desk — Codex &amp; Claude Usage Tracker for macOS">
+  <meta name="twitter:description" content="Track Codex and Claude usage limits, reset times, and multiple accounts from your Mac menu bar. Free, open source, and local. Build from source for macOS 14+.">
   <meta name="twitter:image" content="https://usage-desk.nikhilkr.in/assets/social-preview.png">
-  <meta name="twitter:image:alt" content="Usage Desk: Codex quotas, reset times, and accounts in your Mac menu bar.">
+  <meta name="twitter:image:alt" content="Usage Desk: Codex and Claude quotas, reset times, and accounts in your Mac menu bar.">
   <meta name="theme-color" content="#ffffff">
-  <title>Usage Desk — Codex Usage &amp; Reset Tracker for macOS</title>
+  <title>Usage Desk — Codex &amp; Claude Usage Tracker for macOS</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="assets/favicon.ico">
   <link rel="apple-touch-icon" href="assets/favicon-180.png">
@@ -44,8 +44,8 @@
       "@type": "WebPage",
       "@id": "https://usage-desk.nikhilkr.in/#webpage",
       "url": "https://usage-desk.nikhilkr.in/",
-      "name": "Usage Desk — Codex Usage & Reset Tracker for macOS",
-      "description": "Track Codex usage limits, reset countdowns, and multiple OpenAI accounts from your Mac menu bar. Free, open source, and local. Build from source for macOS 14+.",
+      "name": "Usage Desk — Codex & Claude Usage Tracker for macOS",
+      "description": "Track Codex and Claude usage limits, reset times, and multiple accounts from your Mac menu bar. Free, open source, and local. Build from source for macOS 14+.",
       "isPartOf": {
         "@id": "https://usage-desk.nikhilkr.in/#website"
       },
@@ -59,10 +59,11 @@
       "@id": "https://usage-desk.nikhilkr.in/#app",
       "name": "Usage Desk",
       "url": "https://usage-desk.nikhilkr.in/",
-      "description": "Free, open-source macOS menu bar app for Codex usage limits, reset countdowns, earned resets, and multiple OpenAI accounts. Currently distributed as source code only.",
+      "description": "Free, open-source macOS menu bar app for Codex and Claude usage limits, reset countdowns, multiple accounts, and earned resets reported by Codex. Currently distributed as source code only.",
       "operatingSystem": "macOS 14 or later",
       "applicationCategory": "UtilitiesApplication",
-      "softwareRequirements": "Swift 6 or newer to build; a recent Codex CLI signed in with a ChatGPT account.",
+      "softwareVersion": "0.1.1",
+      "softwareRequirements": "Swift 6 or newer to build; Codex CLI with ChatGPT sign-in, or Claude Code CLI with Pro/Max sign-in.",
       "isAccessibleForFree": true,
       "license": "https://github.com/NiKHiLkr23/usage-desk/blob/main/LICENSE",
       "image": "https://usage-desk.nikhilkr.in/assets/social-preview.png",
@@ -80,7 +81,7 @@
         "url": "https://nikhilkr.in"
       },
       "featureList": [
-        "Five-hour and weekly Codex usage windows",
+        "Five-hour and weekly Codex and Claude usage windows",
         "Quota reset countdowns",
         "Earned resets reported by Codex",
         "Multiple account usage viewing",
@@ -116,8 +117,8 @@
   <section class="hero shell" id="the-app" aria-labelledby="hero-title">
     <div class="hero-copy">
       <p class="hero-platform">Native macOS. Free &amp; open source.</p>
-      <h1 id="hero-title">Codex usage,<br>one click away.</h1>
-      <p class="hero-description">Usage Desk is a free, open-source Mac app for checking Codex quotas, reset times, and multiple accounts.</p>
+      <h1 id="hero-title">Your AI usage,<br>one click away.</h1>
+      <p class="hero-description">Codex and Claude quotas, reset times, and accounts. Together in your Mac menu bar.</p>
       <div class="install-block" data-install-block>
         <div class="install-command"><span class="command-prompt" aria-hidden="true">$</span><code id="install-command-hero">curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh</code><button class="copy-button" type="button" data-copy-command aria-label="Copy install command" aria-controls="install-command-hero" hidden><svg class="copy-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg><svg class="check-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span data-copy-label>Copy</span></button></div>
         <p class="copy-feedback visually-hidden" data-copy-feedback role="status" aria-live="polite"></p>
@@ -127,7 +128,7 @@
         <a class="button primary star-link" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg>Star on GitHub</a>
         <a class="text-link" href="#how-it-works">How it works <span aria-hidden="true">↗</span></a>
       </div>
-      <p class="build-note">Requires Xcode Command Line Tools and a signed-in Codex CLI.</p>
+      <p class="build-note">Requires Xcode Command Line Tools and a signed-in Codex or Claude CLI.</p>
     </div>
     <figure class="product-shot">
       <div class="showcase-tabs" role="tablist" aria-label="Explore Usage Desk" data-showcase-tabs hidden>
@@ -137,7 +138,7 @@
       </div>
       <div class="showcase-viewport">
         <div role="tabpanel" id="preview-usage" aria-labelledby="preview-tab-usage"><img draggable="false" src="assets/showcase-usage.png" width="840" height="1000" alt="Actual Usage Desk app with sample data: five-hour and weekly Codex quotas, reset countdowns, and an earned reset." fetchpriority="high" decoding="async"></div>
-        <div role="tabpanel" id="preview-accounts" aria-labelledby="preview-tab-accounts" hidden><img draggable="false" src="assets/showcase-accounts.png" width="840" height="1000" alt="Actual Usage Desk Accounts tab with three sample profiles: Current account, Work, and Side projects." decoding="async"></div>
+        <div role="tabpanel" id="preview-accounts" aria-labelledby="preview-tab-accounts" hidden><img draggable="false" src="assets/showcase-accounts.png" width="840" height="1000" alt="Actual Usage Desk Accounts tab with sample Codex and Claude profiles." decoding="async"></div>
         <div role="tabpanel" id="preview-resets" aria-labelledby="preview-tab-resets" hidden><img draggable="false" src="assets/showcase-resets.png" width="840" height="1000" alt="Actual Usage Desk Resets tab showing a sample earned reset and its expiration date." decoding="async"></div>
       </div>
       <figcaption>Actual macOS app · Sample account data.</figcaption>
@@ -148,17 +149,17 @@
     <h2 id="features-title">A quick check.<br>Then back to work.</h2>
     <div class="feature-list">
       <div><h3>See what’s left</h3><p>Five-hour and weekly quotas, with a countdown to each reset.</p></div>
-      <div><h3>Keep accounts together</h3><p>Connect separate OpenAI accounts and choose whose usage to view.</p></div>
+      <div><h3>Keep accounts together</h3><p>Keep Codex and Claude accounts together. Choose whose usage to view.</p></div>
       <div><h3>Find available resets</h3><p>See the earned resets reported by Codex, alongside your usage.</p></div>
     </div>
   </section>
 
   <section class="setup-section" id="how-it-works" aria-labelledby="setup-title">
     <div class="shell setup-layout">
-      <div class="section-heading"><h2 id="setup-title">Set up once.<br>Check any time.</h2><p>A native Mac app that works with your installed Codex CLI.</p></div>
+      <div class="section-heading"><h2 id="setup-title">Set up once.<br>Check any time.</h2><p>A native Mac app that works with your installed Codex and Claude CLIs.</p></div>
       <ol class="setup-steps">
         <li><h3>Install Usage Desk</h3><p>Run the <a href="#get-started">source installer</a>, then open the app. Your signed-in Codex CLI account appears automatically.</p></li>
-        <li><h3>Add your other accounts</h3><p>Choose Add account, select a browser profile, and sign in with OpenAI.</p></li>
+        <li><h3>Add your other accounts</h3><p>Choose Add account, then Codex or Claude. Sign in with OpenAI or connect an existing Claude CLI profile.</p></li>
         <li><h3>Check from the menu bar</h3><p>Usage refreshes in the background. Click the menu bar to see the latest.</p></li>
       </ol>
     </div>
@@ -166,24 +167,25 @@
 
   <section class="privacy-section shell" id="open-source" aria-labelledby="privacy-title">
     <h2 id="privacy-title">Local by design.<br>Open by default.</h2>
-    <div><p>Account credentials stay on your Mac. Codex connects directly to OpenAI. Usage Desk has no analytics or intermediary server.</p><div class="privacy-links"><a href="privacy.html">Privacy details</a><a href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
+    <div><p>Account credentials stay on your Mac. Each CLI connects directly to its provider. The native app has no analytics or intermediary server.</p><div class="privacy-links"><a href="privacy.html">Privacy details</a><a href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
   </section>
 
   <section class="faq-section shell" id="questions" aria-labelledby="faq-title">
     <h2 id="faq-title">Before you install.</h2>
     <div class="faq-list">
       <details><summary>Is there a prebuilt app?</summary><p>There is no prebuilt, signed installer yet. The source installer below downloads a pinned source revision, builds Usage Desk on your Mac, and installs it in your home Applications folder. macOS 14+ and Swift 6+ are required.</p></details>
-      <details><summary>What do I need?</summary><p>macOS 14 or later and a recent Codex CLI signed in with a ChatGPT account. Building from source also requires Swift 6 or newer. Chrome is optional.</p></details>
+      <details><summary>What do I need?</summary><p>macOS 14+, Swift 6+, and either Codex CLI signed in with ChatGPT or Claude Code CLI signed in with Pro/Max. Chrome is optional for Codex sign-in.</p></details>
       <details><summary>Does it show every ChatGPT limit?</summary><p>It shows the usage windows and earned resets returned by Codex. ChatGPT model or feature limits that Codex doesn’t expose won’t appear here.</p></details>
+      <details><summary>Does it support Claude?</summary><p>Yes. Choose Add account → Claude and connect your existing Claude Code CLI profile. Pro and Max usage windows are read without sending a model prompt. Claude’s experimental CLI protocol may require updates.</p></details>
       <details><summary>Can I monitor multiple Codex accounts?</summary><p>Yes. Connect each OpenAI account separately, optionally choosing a Chrome profile for sign-in, then select whose Codex usage to view. Credentials stay on your Mac.</p></details>
       <details><summary>Does choosing an account switch Codex too?</summary><p>It selects the usage you’re viewing in Usage Desk. Your active Codex desktop and CLI login stay unchanged.</p></details>
       <details><summary>Can Usage Desk redeem an earned reset?</summary><p>Usage Desk displays the earned resets returned by Codex. It does not redeem them or run model requests.</p></details>
-      <details><summary>Is it free?</summary><p>Yes. The app and its original artwork are MIT licensed. Codex and ChatGPT account plans are separate.</p></details>
+      <details><summary>Is it free?</summary><p>Yes. The app and its original artwork are MIT licensed. OpenAI and Anthropic subscriptions are separate.</p></details>
     </div>
   </section>
 
   <section class="build-section shell" id="get-started" aria-labelledby="build-title">
-    <div><h2 id="build-title">Install Usage Desk.</h2><p>Builds on your Mac from source.<br>No prebuilt app download yet.</p><a class="button primary" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><p class="build-note">Requires macOS 14+, Swift 6+, and a recent Codex CLI signed in with a ChatGPT account.</p></div>
+    <div><h2 id="build-title">Install Usage Desk.</h2><p>Builds on your Mac from source.<br>No prebuilt app download yet.</p><a class="button primary" href="https://github.com/NiKHiLkr23/usage-desk" data-repository target="_blank" rel="noopener noreferrer">GitHub</a><p class="build-note">Requires macOS 14+, Swift 6+, and a signed-in Codex or Claude CLI.</p></div>
     <details class="source-instructions" id="source-instructions" open><summary>Install from source</summary><p>Run in Terminal. Builds locally and installs into <code>~/Applications</code>. No sudo required.</p><div class="install-block" data-install-block>
         <div class="install-command"><span class="command-prompt" aria-hidden="true">$</span><code id="install-command-footer">curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh</code><button class="copy-button" type="button" data-copy-command aria-label="Copy install command" aria-controls="install-command-footer" hidden><svg class="copy-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg><svg class="check-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span data-copy-label>Copy</span></button></div>
         <p class="copy-feedback visually-hidden" data-copy-feedback role="status" aria-live="polite"></p>

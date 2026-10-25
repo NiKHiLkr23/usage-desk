@@ -79,7 +79,7 @@ public actor CodexClient {
             await self?.disconnected(connection: connection)
         }
         do {
-            let _: Data = try await request("initialize", params: ["clientInfo": ["name": "usage_desk_macos", "title": "Usage desk", "version": "0.1.0"]])
+            let _: Data = try await request("initialize", params: ["clientInfo": ["name": "usage_desk_macos", "title": "Usage desk", "version": Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "development"]])
             try send(["method": "initialized", "params": [:]])
             initialized = true
         } catch { close(); throw error }

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -22,6 +23,20 @@ const plist = path.join(root, 'Support/Info.plist');
 const original = await readFile(plist, 'utf8');
 assert.match(original, /<key>CFBundleShortVersionString<\/key>\s*<string>[^<]+<\/string>/);
 outputs.push([plist, original, original.replace(/(<key>CFBundleShortVersionString<\/key>\s*<string>)[^<]+/, `$1${version}`)]);
+const pagePath = path.join(root, 'website/index.html');
+const page = await readFile(pagePath, 'utf8');
+const nextPage = page.replace(/("softwareVersion": ")[^"]+/, (_, prefix) => prefix + version);
+assert.match(nextPage, /"softwareVersion": "/);
+outputs.push([pagePath, page, nextPage]);
+const configPath = path.join(root, 'website/vercel.json');
+const configSource = await readFile(configPath, 'utf8');
+const config = JSON.parse(configSource);
+const structured = nextPage.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1];
+const digest = createHash('sha256').update(structured).digest('base64');
+for (const rule of config.headers) for (const header of rule.headers) {
+  if (header.key === 'Content-Security-Policy') header.value = header.value.replace(/'sha256-[^']+'/, `'sha256-${digest}'`);
+}
+outputs.push([configPath, configSource, JSON.stringify(config, null, 2) + '\n']);
 if (check) {
   for (const [filename, source, expected] of outputs) assert.equal(source, expected, `Version drift in ${path.relative(root, filename)}; run node scripts/version.mjs ${version}`);
   console.log(`Version ${version} is consistent across app and package metadata.`);
