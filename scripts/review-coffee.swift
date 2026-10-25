@@ -10,6 +10,7 @@ struct CoffeeStudy: View {
     let active: Bool
     let hovering: Bool
     let stage: String
+    var loop: CoffeeLoopFrame?
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text("\(variant.rawValue.capitalized) / Keep awake").font(.system(size: 26, weight: .semibold))
@@ -26,7 +27,7 @@ struct CoffeeStudy: View {
                     Text(dark ? "Dark" : "Light").font(.system(size: 11)).foregroundStyle(.secondary).frame(width: 44, alignment: .leading)
                     footer(dark: dark)
                     Spacer()
-                    CoffeeGlyph(variant: variant, progress: progress, active: active)
+                    CoffeeGlyph(variant: variant, progress: progress, active: active, loop: loop)
                         .foregroundStyle(dark ? Color.white : Color.black)
                         .frame(width: 80, height: 80)
                         .padding(18).background(dark ? Color(white: 0.08) : Color(white: 0.98), in: RoundedRectangle(cornerRadius: 12))
@@ -39,7 +40,7 @@ struct CoffeeStudy: View {
                 Text("4× detail").frame(width: 116)
             }.font(.system(size: 11)).foregroundStyle(.secondary)
             Divider()
-            Text("Hover plays once, holds, then resets on exit. Active fill + dot remain at rest.")
+            Text("Off: hover plays once. On: liquid and steam loop continuously without hover.")
                 .font(.system(size: 12))
             Text("Prevents idle system sleep only. Display policy is unchanged. Stops on quit.")
                 .font(.system(size: 11)).foregroundStyle(.secondary)
@@ -50,7 +51,7 @@ struct CoffeeStudy: View {
             Circle().fill(Color(red: 0.24, green: 0.55, blue: 0.36)).frame(width: 5, height: 5)
             Text("Live"); Text("· just now").foregroundStyle(.secondary)
             Spacer()
-            CoffeeGlyph(variant: variant, progress: progress, active: active).frame(width: 20, height: 20)
+            CoffeeGlyph(variant: variant, progress: progress, active: active, loop: loop).frame(width: 20, height: 20)
                 .frame(width: 32, height: 32)
                 .background(hovering ? Color.primary.opacity(0.065) : .clear, in: Circle())
             Image(systemName: "power").font(.system(size: 14)).frame(width: 32, height: 32).foregroundStyle(.secondary)
@@ -63,8 +64,9 @@ struct CoffeeStudy: View {
 
 struct CoffeeReviewWindow: View {
     @ObservedObject var controller: KeepAwakeController
-    @State private var variant = CoffeeAnimation.brew
+    @State private var variant = CoffeeAnimation.pour
     @State private var dark = false
+    @State private var reduceMotion = false
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Coffee motion review").font(.title2.bold())
@@ -72,21 +74,22 @@ struct CoffeeReviewWindow: View {
                 .font(.caption).foregroundStyle(.secondary)
             Picker("Animation", selection: $variant) { ForEach(CoffeeAnimation.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.segmented)
             Toggle("Dark appearance", isOn: $dark)
+            Toggle("Reduce Motion (review override)", isOn: $reduceMotion)
             HStack {
                 Text("Live · just now").font(.system(size: 10)).foregroundStyle(.secondary)
                 Spacer()
-                CoffeeButton(controller: controller, variant: variant)
+                CoffeeButton(controller: controller, variant: variant, reduceMotionOverride: reduceMotion)
                 Button { NSApp.terminate(nil) } label: { Image(systemName: "power") }.buttonStyle(DeskIconButton()).help("Quit review and release Keep awake")
             }.padding(16).background(DeskTheme.background, in: RoundedRectangle(cornerRadius: 10))
             HStack(spacing: 40) {
                 ForEach(CoffeeAnimation.allCases, id: \.self) { choice in
                     VStack(spacing: 10) {
-                        CoffeeButton(controller: controller, variant: choice).scaleEffect(3).frame(width: 110, height: 110)
+                        CoffeeButton(controller: controller, variant: choice, reduceMotionOverride: reduceMotion).scaleEffect(3).frame(width: 110, height: 110)
                         Text(choice.rawValue.capitalized).font(.caption)
                     }
                 }
             }
-            Text(controller.isEnabled ? "Keep awake is ON — click a coffee button to turn off." : "Keep awake is OFF — hover any coffee button to compare.").font(.callout)
+            Text(controller.isEnabled ? "Keep awake is ON — motion continues without hover. Click to turn off." : "Keep awake is OFF — hover any coffee button to compare.").font(.callout)
         }.padding(28).frame(width: 560).environment(\.colorScheme, dark ? .dark : .light)
             .background(dark ? Color(white: 0.08) : Color(white: 0.98))
             .foregroundStyle(dark ? Color.white : Color.black)
@@ -119,28 +122,37 @@ struct CoffeeReviewWindow: View {
         NSApp.setActivationPolicy(.prohibited)
         let output = URL(fileURLWithPath: CommandLine.arguments[1], isDirectory: true)
         try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
-        for variant in CoffeeAnimation.allCases { try record(variant, output: output) }
+        if CommandLine.arguments.contains("--pour-loop") {
+            try record(.pour, output: output, looping: true)
+        } else {
+            for variant in CoffeeAnimation.allCases { try record(variant, output: output) }
+        }
     }
 
-    @MainActor static func record(_ variant: CoffeeAnimation, output: URL) throws {
-        let url = output.appendingPathComponent("\(variant.rawValue)-native-study.mp4")
+    @MainActor static func record(_ variant: CoffeeAnimation, output: URL, looping: Bool = false) throws {
+        let name = looping ? "pour-enabled-loop-native" : "\(variant.rawValue)-native-study"
+        let url = output.appendingPathComponent("\(name).mp4")
         try? FileManager.default.removeItem(at: url)
         let frames = output.appendingPathComponent(".frames-\(variant.rawValue)", isDirectory: true)
         try FileManager.default.createDirectory(at: frames, withIntermediateDirectories: true)
         let fps = 30
-        for frame in 0..<240 {
+        for frame in 0..<(looping ? 360 : 240) {
             let t = Double(frame) / Double(fps)
-            let active = t >= 3 && t < 5.7
-            let start: Double? = t >= 0.8 && t < 2.4 ? 0.8 : t >= 3.4 && t < 5 ? 3.4 : t >= 6 && t < 6.3 ? 6 : t >= 6.6 ? 6.6 : nil
+            let active = t >= 3 && t < (looping ? 10 : 5.7)
+            let reduced = looping && t >= 9 && t < 10
+            let loop = looping && active && !reduced ? CoffeeLoopFrame(elapsed: t - 3) : nil
+            let start: Double? = looping
+                ? (t >= 0.8 && t < 2.4 ? 0.8 : t >= 10.8 ? 10.8 : nil)
+                : (t >= 0.8 && t < 2.4 ? 0.8 : t >= 3.4 && t < 5 ? 3.4 : t >= 6 && t < 6.3 ? 6 : t >= 6.6 ? 6.6 : nil)
             let p = start.map { min(1, (t - $0) / (variant == .steam ? 0.75 : 0.85)) } ?? 0
-            let stage = start != nil ? (p < 1 ? "Hover → forward" : "Hover → hold") : active ? "Mouse exit · active at rest" : t < 0.8 ? "Rest" : "Mouse exit · reset"
-            let root = CoffeeStudy(variant: variant, progress: p, active: active, hovering: start != nil, stage: stage)
+            let stage = reduced ? "On → Reduce Motion (static)" : loop != nil ? "On → looping without hover" : start != nil ? (p < 1 ? "Hover → forward" : "Hover → hold") : active ? "On → static" : t < 0.8 ? "Off → rest" : "Off → reset"
+            let root = CoffeeStudy(variant: variant, progress: p, active: active, hovering: start != nil, stage: stage, loop: loop)
             let renderer = ImageRenderer(content: root); renderer.scale = 2
             guard let cgImage = renderer.cgImage else { fatalError("SwiftUI rendering failed") }
             let bitmap = NSBitmapImageRep(cgImage: cgImage)
             let png = bitmap.representation(using: .png, properties: [:])!
             try png.write(to: frames.appendingPathComponent(String(format: "%04d.png", frame)))
-            if frame == 55 { try png.write(to: output.appendingPathComponent("\(variant.rawValue)-native-study.png")) }
+            if frame == (looping ? 150 : 55) { try png.write(to: output.appendingPathComponent("\(name).png")) }
         }
         let encoder = Process()
         encoder.executableURL = URL(fileURLWithPath: "/usr/bin/env")

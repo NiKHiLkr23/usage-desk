@@ -19,7 +19,7 @@ cd "$task_review"
 export CLANG_MODULE_CACHE_PATH="$task_review/.cache/modules"
 export SWIFT_MODULECACHE_PATH="$task_review/.cache/modules"
 swift build --disable-sandbox -c release --scratch-path .build --cache-path .cache -Xswiftc -module-cache-path -Xswiftc .cache/modules
-if [[ "${1:-}" == --interactive ]]; then
+if [[ "${1:-}" == --interactive || "${1:-}" == --build-only ]]; then
   app_dir="$task_review/Usage Desk Coffee Review.app"
   mkdir -p "$app_dir/Contents/MacOS" "$app_dir/Contents/Resources"
   cp .build/release/ResetDesk "$app_dir/Contents/MacOS/CoffeeReview"
@@ -28,7 +28,11 @@ if [[ "${1:-}" == --interactive ]]; then
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleIdentifier</key><string>in.nikhilkr.usagedesk.coffee-review</string><key>CFBundleName</key><string>Usage Desk Coffee Review</string><key>CFBundleExecutable</key><string>CoffeeReview</string><key>CFBundlePackageType</key><string>APPL</string><key>NSHighResolutionCapable</key><true/></dict></plist>
 PLIST
   codesign --force --sign - "$app_dir"
-  open -n "$app_dir" --args --interactive
+  if [[ "${1:-}" == --interactive ]]; then
+    open -n "$app_dir" --args --interactive
+  else
+    print "Built isolated comparison app: $app_dir"
+  fi
 else
-  .build/release/ResetDesk "$1"
+  .build/release/ResetDesk "$@"
 fi

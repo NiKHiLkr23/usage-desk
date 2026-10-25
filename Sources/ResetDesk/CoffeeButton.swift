@@ -1,30 +1,52 @@
 import SwiftUI
+import AppKit
 
 /// Review alternatives share one glyph and one real toggle implementation.
-/// The normal dashboard uses Brew; comparison controls live only in scripts/.
+/// The normal dashboard uses Pour; comparison controls live only in scripts/.
 enum CoffeeAnimation: String, CaseIterable { case brew, steam, pour }
 
 struct CoffeeButton: View {
     @ObservedObject var controller: KeepAwakeController
-    var variant: CoffeeAnimation = .brew
+    var variant: CoffeeAnimation = .pour
+    // Review may request less motion, but never override the macOS preference.
+    var reduceMotionOverride = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var hovering = false
     @State private var progress: Double = 0
+    @State private var visible = false
+    @State private var loopStart = Date()
+
+    private var motionReduced: Bool { reduceMotion || reduceMotionOverride }
+    private var shouldLoop: Bool { controller.isEnabled && visible && !motionReduced }
 
     var body: some View {
         Button { controller.toggle() } label: {
-            CoffeeGlyph(variant: variant, progress: reduceMotion ? 0 : progress, active: controller.isEnabled)
-                .frame(width: 20, height: 20).accessibilityHidden(true)
+            Group {
+                if shouldLoop {
+                    // This subtree, including its clock, is removed while hidden,
+                    // Off or reduced. Animation never acquires a sleep assertion.
+                    TimelineView(.animation(minimumInterval: 1.0 / 30)) { context in
+                        CoffeeGlyph(variant: variant, active: true,
+                                    loop: CoffeeLoopFrame(elapsed: context.date.timeIntervalSince(loopStart)))
+                    }
+                } else {
+                    CoffeeGlyph(variant: variant, progress: motionReduced || controller.isEnabled ? 0 : progress,
+                                active: controller.isEnabled)
+                }
+            }.frame(width: 20, height: 20).accessibilityHidden(true)
         }.buttonStyle(DeskIconButton())
             .onHover { inside in
                 guard inside != hovering else { return }
                 hovering = inside
-                if inside && !reduceMotion {
+                if inside && !motionReduced && !controller.isEnabled {
                     withAnimation(.linear(duration: variant == .steam ? 0.75 : 0.85)) { progress = 1 }
                 } else { reset() }
             }
-            .onChange(of: reduceMotion) { _, _ in reset() }
-            .onDisappear { reset() }
+            .onChange(of: motionReduced) { _, _ in reset() }
+            .onChange(of: controller.isEnabled) { _, _ in reset() }
+            .onChange(of: shouldLoop) { _, running in if running { loopStart = .now } }
+            .background(CoffeeVisibilityReader { visible = $0 })
+            .onDisappear { visible = false; reset() }
             .help(controller.isEnabled
                   ? "Keep awake: On. Click to turn off. Prevents idle system sleep until quit. Display may sleep; lid-close and forced sleep still apply."
                   : "Keep awake: Off. Click to prevent idle system sleep until quit. Display may sleep; lid-close and forced sleep still apply.")
@@ -43,21 +65,39 @@ struct CoffeeButton: View {
     }
 }
 
-/// Original vectors, normalized to 20 points. One animatable value drives a
-/// finite gesture, so exiting or Reduce Motion never queues a completion task.
+/// A closed periodic curve gives the liquid/steam identical position and
+/// velocity at each seam. This frame is visual only, independent of power state.
+struct CoffeeLoopFrame {
+    static let period: TimeInterval = 2.4
+    let wave: Double
+    let steamSway: Double
+    let steamLift: Double
+    let steamOpacity: Double
+    init(elapsed: TimeInterval) {
+        let angle = 2 * Double.pi * max(0, elapsed) / Self.period
+        wave = 1.3 * sin(angle)
+        steamSway = 0.45 * sin(angle)
+        steamLift = 0.45 * (1 - cos(angle))
+        steamOpacity = 0.78 + 0.12 * cos(angle)
+    }
+}
+
+/// Original vectors, normalized to 20 points. The inactive reveal is finite;
+/// the active loop changes liquid and steam only, keeping the cup recognizable.
 struct CoffeeGlyph: View, Animatable {
-    var variant: CoffeeAnimation = .brew
+    var variant: CoffeeAnimation = .pour
     var progress: Double = 0
     var active = false
+    var loop: CoffeeLoopFrame?
     @Environment(\.colorScheme) private var colorScheme
     var animatableData: Double { get { progress } set { progress = newValue } }
 
     var body: some View {
         let p = min(1, max(0, progress))
         let eased = 1 - pow(1 - p, 3)
-        let reveal = variant == .brew || p == 0 ? 1 : eased
+        let reveal = active || variant == .brew || p == 0 ? 1 : eased
         let fill = active ? 0.66 : (variant == .steam ? 0 : 0.63 * eased)
-        let wave = variant == .steam ? 0 : sin(p * .pi * 3) * sin(p * .pi) * (variant == .pour ? 1.5 : 1.0)
+        let wave = loop?.wave ?? (variant == .steam ? 0 : sin(p * .pi * 3) * sin(p * .pi) * (variant == .pour ? 1.5 : 1.0))
         let coffee = colorScheme == .dark ? Color(red: 0.76, green: 0.52, blue: 0.31) : Color(red: 0.48, green: 0.27, blue: 0.12)
         Canvas { context, size in
             context.scaleBy(x: size.width / 20, y: size.height / 20)
@@ -88,11 +128,14 @@ struct CoffeeGlyph: View, Animatable {
             context.stroke(handle.trimmedPath(from: 0, to: reveal), with: .color(ink), style: stroke)
             var saucer = Path(); saucer.move(to: CGPoint(x: 2.6, y: 17.8)); saucer.addQuadCurve(to: CGPoint(x: 15, y: 17.8), control: CGPoint(x: 8.8, y: 18.5))
             context.stroke(saucer, with: .color(ink), style: stroke)
-            let steam = variant == .brew ? eased * 0.65 : eased
+            let steam = active ? 1 : variant == .brew ? eased * 0.65 : eased
+            let steamOpacity = loop?.steamOpacity ?? steam
             for x in [7.0, 10.5] {
-                var path = Path(); path.move(to: CGPoint(x: x, y: 5.6))
-                path.addCurve(to: CGPoint(x: x, y: 1.7), control1: CGPoint(x: x - 1.8, y: 4.1), control2: CGPoint(x: x + 1.8, y: 3.4))
-                context.stroke(path.trimmedPath(from: 0, to: steam), with: .color(ink.opacity(steam)), style: StrokeStyle(lineWidth: 0.9, lineCap: .round))
+                let sway = loop?.steamSway ?? 0
+                let lift = loop?.steamLift ?? 0
+                var path = Path(); path.move(to: CGPoint(x: x, y: 5.6 - lift * 0.3))
+                path.addCurve(to: CGPoint(x: x + sway, y: 1.7 - lift), control1: CGPoint(x: x - 1.8 + sway, y: 4.1 - lift), control2: CGPoint(x: x + 1.8 + sway, y: 3.4 - lift))
+                context.stroke(path.trimmedPath(from: 0, to: steam), with: .color(ink.opacity(steamOpacity)), style: StrokeStyle(lineWidth: 0.9, lineCap: .round))
             }
             if active {
                 // Shape + filled coffee identify On without relying on hue.
@@ -100,5 +143,40 @@ struct CoffeeGlyph: View, Animatable {
                 context.fill(dot, with: .color(ink))
             }
         }
+    }
+}
+
+/// Cached popovers retain SwiftUI views while ordered out. Observe the owning
+/// window instead of assuming onDisappear always fires. Occlusion also suspends
+/// work for minimized/fully covered review windows. No polling timer is needed.
+struct CoffeeVisibilityReader: NSViewRepresentable {
+    var update: (Bool) -> Void
+    func makeNSView(context: Context) -> VisibilityView { VisibilityView(update: update) }
+    func updateNSView(_ nsView: VisibilityView, context: Context) { nsView.update = update }
+
+    final class VisibilityView: NSView {
+        var update: (Bool) -> Void
+        private var observation: NSObjectProtocol?
+        private var lastValue: Bool?
+        init(update: @escaping (Bool) -> Void) { self.update = update; super.init(frame: .zero) }
+        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if let observation { NotificationCenter.default.removeObserver(observation) }
+            observation = nil
+            if let window {
+                observation = NotificationCenter.default.addObserver(forName: NSWindow.didChangeOcclusionStateNotification,
+                                                                     object: window, queue: .main) { [weak self] _ in self?.refresh() }
+            }
+            refresh()
+        }
+        private func refresh() {
+            let value = window?.isVisible == true && window?.occlusionState.contains(.visible) == true && !isHiddenOrHasHiddenAncestor
+            guard value != lastValue else { return }
+            lastValue = value
+            // Window attachment can happen inside a SwiftUI update transaction.
+            DispatchQueue.main.async { [weak self] in self?.update(value) }
+        }
+        deinit { if let observation { NotificationCenter.default.removeObserver(observation) } }
     }
 }
