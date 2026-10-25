@@ -1,7 +1,7 @@
 # Privacy
 
 The native Usage Desk app has no hosted account system, telemetry, analytics, or crash-upload service.
-The website has separate, cookie-free aggregate analytics; it never receives accounts from the app.
+The production website is configured for separate, cookie-free aggregate analytics after hosting activation; it never receives accounts from the app.
 
 ## What the app reads
 
@@ -12,7 +12,7 @@ The website has separate, cookie-free aggregate analytics; it never receives acc
 
 ## What is stored
 
-The current CLI account stays in its existing Codex home (normally `~/.codex`). Added accounts
+The current Codex CLI account stays in its existing Codex home (normally `~/.codex`). Additional Codex accounts
 use `~/Library/Application Support/ResetDesk/accounts/<uuid>/`. Codex manages their authentication
 and refresh credentials locally. Metadata is `accounts.json` in the parent support folder;
 preferences use macOS UserDefaults. The app does not promise that credentials are stored in Keychain:
@@ -38,8 +38,9 @@ Custom events are disabled by default pending plan verification. If enabled, the
 event names and a hero/footer placement for successful command copies, never clipboard contents or
 account data. The installer does not report success, and the app does not report active users.
 See `docs/ANALYTICS.md` for activation and measurement limits.
-A hosting provider may process ordinary access logs under its own policy. Release downloads
-from GitHub are subject to GitHub's policies. The local preview does not contact GitHub or OpenAI.
+A hosting provider may process ordinary access logs under its own policy. Source downloads
+and repository links are subject to GitHub's policies. The interactive preview sends no account data
+to GitHub, OpenAI, or Anthropic; external links open only when chosen.
 
 ## Public examples
 

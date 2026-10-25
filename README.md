@@ -10,14 +10,14 @@ Select an account in a compact list, or expand the same panel to manage its conn
 
 [Website](https://usage-desk.nikhilkr.in/) · [Report an issue](https://github.com/NiKHiLkr23/usage-desk/issues)
 
-> **Version:** 0.1.1 (build 2), in development. **Distribution:** source only; no prebuilt app.
+> **Version:** 0.1.1, in development. **Distribution:** source only; no prebuilt app.
 > Get the source from [GitHub](https://github.com/NiKHiLkr23/usage-desk) and build it on your Mac using the instructions below.
 
 ## Features
 
 - Remaining quota percentages and reset countdowns for reported usage windows.
 - Earned-reset counts and details when Codex supplies them; redeem resets in Codex.
-- Separate local sign-ins for added accounts; choose a Chrome profile or use your default browser.
+- Separate local Codex sign-ins via your browser, plus connections to existing Claude CLI profiles.
 - Quick account selection, expanded account management, and inline Preferences.
 - One anchored panel, smooth resizing, full-row account hit targets, and quit confirmation.
 - System appearance by default, optional Light/Dark overrides, and Reduce Motion support.
@@ -34,7 +34,7 @@ Select an account in a compact list, or expand the same panel to manage its conn
 
 ## Claude accounts
 
-Choose **Add account → Claude**, enter a label, and connect your existing Claude CLI profile.
+Open **Add account**, select **Claude**, enter a label, and connect your existing Claude CLI profile.
 The default is `~/.claude`. If T3 Code sets `CLAUDE_CONFIG_DIR`, choose that same directory.
 Usage Desk reads the account returned by Claude CLI and displays five-hour and weekly quota
 windows. Additional CLI profiles can be connected separately; existing Codex profiles remain Codex.
@@ -60,7 +60,7 @@ curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh
 [Inspect the installer](https://usage-desk.nikhilkr.in/install.sh) before running it.
 It fetches a pinned source revision from this repository, verifies the commit, builds locally,
 and installs an ad-hoc-signed app into `~/Applications` without sudo. It does not install the
-Codex CLI or sign you in. In an interactive terminal, it offers to open Usage Desk when
+Codex or Claude CLI, or sign you in. In an interactive terminal, it offers to open Usage Desk when
 installation finishes. Otherwise, open it from your home Applications folder.
 An existing app is never overwritten; quit it and move it to Trash before reinstalling.
 Your account data is retained. This source installer does not download a prebuilt app or
@@ -85,11 +85,11 @@ we do not ask users to disable Gatekeeper.
 
 ## Connect your accounts
 
-1. Your current Codex CLI account is discovered automatically.
-2. Open **Accounts → Add account → Codex**. Give it a label and choose a Chrome profile or the default browser.
-3. Complete OpenAI sign-in in your browser, then verify the email shown in Usage Desk.
-4. Repeat for each account, one sign-in at a time.
-5. Click an account in the compact list to view its usage. **Manage accounts** opens its connection settings.
+1. For Codex, the current CLI account is discovered automatically if already signed in.
+2. For another Codex account, open **Accounts → Add account**, select **Codex**, enter a label, and choose a Chrome profile or the default browser. Complete OpenAI sign-in and verify the returned email.
+3. For Claude, open **Add account**, select **Claude**, enter a label, and connect the signed-in CLI profile. Claude accounts are not added automatically.
+4. Repeat for each account, completing one sign-in at a time.
+5. Click an account in the compact list to view its usage. The account’s gear button opens its connection settings.
 
 A Chrome profile's Google email can differ from its OpenAI email. The returned OpenAI email is authoritative.
 The panel may close while Chrome is active; sign-in continues. Reopen it to check the result.
@@ -107,13 +107,13 @@ This is an independent community project, not affiliated with or endorsed by Ope
 ## Privacy and local storage
 
 The native app has no Usage Desk backend, analytics, or account service. Codex communicates with OpenAI
-and Claude communicates with Anthropic for authentication and usage reads. Added accounts use separate local Codex homes under:
+and Claude communicates with Anthropic for authentication and usage reads. Additional Codex accounts use separate local homes under:
 
 ```text
 ~/Library/Application Support/ResetDesk/accounts/<uuid>/
 ```
 
-Labels are in `accounts.json` beside that folder. Codex stores credentials locally; treat these
+Claude profiles use the existing configuration directory you select (normally `~/.claude`); they do not get a Codex home. Provider, label, and directory metadata are in `accounts.json` beside the accounts folder. Codex stores credentials locally; treat these
 files as sensitive. The existing bundle identifier and `ResetDesk` storage name remain stable
 for compatibility. The website and app do not share accounts. See [Privacy](docs/PRIVACY.md)
 and [Security](SECURITY.md). Website-only visitor measurement is documented in [Analytics](docs/ANALYTICS.md);

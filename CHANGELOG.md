@@ -2,7 +2,7 @@
 
 ## Unreleased — 0.1.1
 
-- Fixed Light/Dark selection changing only the icon when the popover inherits a dark menu-bar appearance. Build 3 applies the choice to the owning window and SwiftUI colors.
+- Fixed Light/Dark selection changing only the icon when the popover inherits a dark menu-bar appearance. The app applies the choice to the owning window and SwiftUI colors.
 
 - Fixed the native circular theme reveal disappearing during SwiftUI appearance updates; the overlay now uses a stable AppKit surface.
 
@@ -25,7 +25,7 @@
   disabling telemetry, error reporting, feedback, and automatic updates.
 - Keep provider icons at native menu size instead of displaying full-size logos in the account picker.
 - Copy sign-in commands and links show clipboard success, retry feedback, and VoiceOver announcements without shifting the layout.
-- Shared version source and version/build information in Preferences.
+- Shared version source and version information in Preferences.
 - Refreshed Codex/Claude website copy, native screenshots, and social cards.
 - CI-gated source-release drafts, text-asset checksums, and an installer pinned to a reviewed 0.1.1 source checkpoint.
 - Production-only website analytics wiring, privacy-signal handling, and plan-gated install-interest events; no app telemetry.

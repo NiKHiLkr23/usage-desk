@@ -13,7 +13,7 @@ npm run version:check
 ```
 
 The command synchronizes package metadata, the app plist, website structured data, and its exact CSP hash.
-Increment `CFBundleVersion` in `Support/Info.plist` for a new build. Preferences displays both values;
+Increment `CFBundleVersion` in `Support/Info.plist` for a new build. Keep this internal build identifier out of user-facing version labels; Preferences displays only the version.
 Codex's initialization handshake uses the bundled app version. Direct SwiftPM runs report development.
 Keep `CHANGELOG.md` and `docs/releases/v<VERSION>.md` current.
 

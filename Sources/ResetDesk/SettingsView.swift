@@ -46,10 +46,10 @@ struct SettingsView: View {
                 }.disabled(store.pendingLogin != nil)
             }
             if let message = store.message { Text(message).font(.system(size: 11)).foregroundStyle(DeskTheme.amber).textSelection(.enabled) }
-            Text("Account credentials are managed locally by each provider’s CLI. No Node server, cloud database, analytics, or browser extension is used.")
+            Text("Sign-ins are managed by Codex and Claude CLI. Usage Desk has no analytics or cloud account.")
                 .font(.system(size: 10)).foregroundStyle(DeskTheme.muted)
             HStack {
-                Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Development") (build \(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"))")
+                Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Development")")
                 Spacer()
                 Link("Release notes", destination: URL(string: "https://github.com/NiKHiLkr23/usage-desk/releases")!)
             }.font(.system(size: 10)).foregroundStyle(DeskTheme.muted)

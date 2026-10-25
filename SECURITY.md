@@ -18,8 +18,8 @@ Security fixes target the current supported release; older prereleases may requi
 
 ## Boundaries
 
-- Added accounts have separate local Codex homes; directory and metadata permissions are restricted.
-- Only account reads, rate-limit reads, and explicit login start/cancel calls are permitted by the bridge.
+- Additional Codex accounts have separate local homes; Usage Desk restricts permissions on its account directories and metadata. Claude connections reference an existing CLI configuration directory and retain its sign-in.
+- The Codex bridge permits account reads, rate-limit reads, and explicit login start/cancel calls. Claude probes send only initialize/get_usage and reject tool requests.
 - Login URLs are validated and attempt IDs are correlated; raw backend errors are not displayed.
 - No browser cookie/password extraction and no model-turn or reset-redemption endpoint is exposed.
 - The app is not a security boundary against software running as the same macOS user.
