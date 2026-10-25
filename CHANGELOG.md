@@ -7,7 +7,7 @@
 - Per-account editing with saved display names, a direct header shortcut, and retained CLI credentials on removal.
 - Quick account rows open usage immediately and show quota/reset summaries; Add account preselects Codex or Claude.
 - Successful connections open usage automatically; failed or mismatched connections stay in account management.
-- Claude orange provider marks, semantic quota warnings, and Command-1/2/3 and Command-comma navigation.
+- Claude orange provider marks, semantic quota colors, and Command-1/2/3 and Command-comma navigation.
 
 - Claude Pro/Max quota windows and reset times through an existing Claude CLI sign-in.
 - Codex/Claude provider selection and provider icons throughout the account interface.

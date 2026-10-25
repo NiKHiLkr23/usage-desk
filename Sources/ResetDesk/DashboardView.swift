@@ -265,10 +265,6 @@ struct MeterView: View {
                     RoundedRectangle(cornerRadius: 2).fill(Double(index) / 12 < meter.remaining / 100 ? DeskTheme.quota(meter.remaining) : DeskTheme.track)
                 }
             }.frame(height: 15).accessibilityElement(children: .ignore).accessibilityLabel("\(meter.label) remaining").accessibilityValue("\(Int(meter.remaining)) percent")
-            if meter.remaining <= 20 {
-                Label(meter.remaining <= 0 ? "Quota exhausted" : "Low quota", systemImage: meter.remaining <= 0 ? "xmark.circle" : "exclamationmark.triangle")
-                    .font(.system(size: 10, weight: .medium)).foregroundStyle(DeskTheme.quota(meter.remaining))
-            }
             TimelineView(.periodic(from: .now, by: 30)) { context in
                 Text(meter.resetDate.map { $0 <= context.date ? "Awaiting update" : "Resets in \(countdown($0, now: context.date))" } ?? "Reset time not reported")
                     .font(.system(size: 10)).foregroundStyle(DeskTheme.muted)

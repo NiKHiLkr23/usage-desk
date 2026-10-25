@@ -20,7 +20,7 @@ struct AccountQuickSummary {
         guard let meter = state.usage?.meters.first else {
             title = state.isLoading ? "Updating…" : "Not reported"; return
         }
-        title = meter.remaining <= 0 ? "Exhausted" : "\(Int(meter.remaining.rounded()))% left"
+        title = "\(Int(meter.remaining.rounded()))% left"
         color = DeskTheme.quota(meter.remaining)
         if let reset = meter.resetDate {
             detail = reset <= now ? "Awaiting update" : "Resets in \(countdown(reset, now: now))"
