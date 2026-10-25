@@ -29,7 +29,8 @@ fully rounded; command fields and the app frame use softer rectangular corners.
   Provider switching changes quotas/reset availability. Gears open the chosen account without changing
   the viewed account. Editing display names is memory-only and gives Saved feedback.
   The menu-bar entry toggles the panel. No Add account, sign-in, reconnect, removal, Quit, CLI path,
-  launch-at-login, or real provider calls are exposed. Preferences intentionally shows only previewable controls.
+  launch-at-login, or real provider calls are exposed. The coffee control is an explicitly approved
+  exception for a visual-only interaction; it never requests a wake lock or macOS access. Preferences intentionally shows only previewable controls.
   Keep the hero free of preview/sample captions. Explain sample data on the Privacy page.
   The interface is a reconstruction, not a native screenshot.
   Keep Usage readable without JavaScript. Fixed panel height prevents layout shifts on page navigation.
@@ -48,7 +49,12 @@ Preferences knobs slide once and hold. Both reset instantly on exit. Tabs animat
 Theme controls share one System → Light → Dark preference. A 480 ms circular reveal grows from
 whichever theme button was pressed across the whole viewport, using the View Transition API.
 Unsupported browsers, unchanged effective themes, or Reduce Motion switch instantly. Rapid changes
-cancel old effects. No autoplay, simulated quota changes, or decorative entrance sequences.
+cancel old effects. No autoplay, simulated quota changes, or decorative entrance sequences. The selected Pour coffee
+control plays a finite 850 ms reveal on inactive hover. Clicking it shows the filled cup and dot, with
+liquid and steam following the native 2.4-second loop without hover. A second click stops it.
+Reduce Motion keeps the active cup static; hidden/offscreen previews suspend rendering.
+The tooltip, accessible description and FAQ explain that this is animation only; real keep-awake
+is available in the Mac app. No power API, network request or persisted toggle is involved.
 
 ## Verification
 

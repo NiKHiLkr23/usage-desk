@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="preview.css">
   <script src="app-preview.js" defer></script>
+  <script src="coffee-preview.js" defer></script>
   <script src="app.js" defer></script><script src="analytics.js" defer></script>
   <script type="application/ld+json">
 {
@@ -87,7 +88,8 @@
         "Quota reset countdowns",
         "Earned resets reported by Codex",
         "Multiple account usage viewing",
-        "Local credentials; no intermediary server"
+        "Local credentials; no intermediary server",
+        "Keep awake until toggled off or the app quits"
       ],
       "sameAs": [
         "https://github.com/NiKHiLkr23/usage-desk"
@@ -177,7 +179,21 @@
           <section class="preview-settings" data-preview-preferences-page aria-label="Preferences" hidden>
             <p class="preview-note">Theme follows your system by default. Use the icon to override it.</p><label class="preview-check"><input type="checkbox" data-menu-quota checked>Show quota in menu bar</label><label class="preview-refresh-label">Refresh usage<select data-preview-interval><option value="60">Every minute</option><option value="120">Every 2 minutes</option><option value="300">Every 5 minutes</option></select></label><p class="preview-note preview-settings-note">The native app keeps account data on your Mac.</p><div class="preview-version"><span>Usage Desk <span data-preview-version>0.1.1</span></span><a href="https://github.com/NiKHiLkr23/usage-desk/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Release notes ↗</a></div>
           </section>
-          <footer class="preview-footer" data-preview-footer><span class="preview-live-dot" aria-hidden="true"></span><span data-preview-status>Live · 3 secs</span></footer>
+          <footer class="preview-footer" data-preview-footer>
+            <span class="preview-live-dot" aria-hidden="true"></span><span data-preview-status>Live · 3 secs</span>
+            <button type="button" class="preview-icon-button preview-coffee-button" data-preview-coffee aria-label="Keep awake" aria-pressed="false" aria-describedby="preview-coffee-help" title="Keep awake: Off. Try the coffee animation.">
+              <svg class="preview-coffee" viewBox="0 0 20 20" aria-hidden="true">
+                <defs><path id="preview-coffee-cup" pathLength="1" d="M3.4 7.2 3.8 12.6C4 15.2 6 16 8.7 16S13.4 15.2 13.6 12.6L14 7.2Z"/><clipPath id="preview-coffee-clip"><use href="#preview-coffee-cup"/></clipPath></defs>
+                <path class="preview-coffee-liquid" data-coffee-liquid clip-path="url(#preview-coffee-clip)"/>
+                <g class="preview-coffee-ink"><use href="#preview-coffee-cup" opacity=".22"/><path d="M14 8C18.8 6.9 18.4 13 14 12.9" opacity=".22"/>
+                  <use href="#preview-coffee-cup" data-coffee-outline pathLength="1"/><path d="M14 8C18.8 6.9 18.4 13 14 12.9" data-coffee-outline pathLength="1"/>
+                  <path d="M3.4 7.2H14M2.6 17.8Q8.8 18.5 15 17.8"/>
+                  <g data-coffee-steam><path data-coffee-steam-path="7" pathLength="1"/><path data-coffee-steam-path="10.5" pathLength="1"/></g>
+                </g><circle class="preview-coffee-dot" cx="17.4" cy="16.8" r="1.2"/>
+              </svg>
+            </button>
+            <span class="visually-hidden" id="preview-coffee-help">On the Mac app, this prevents idle system sleep until turned off or quit. This website only previews the animation.</span>
+          </footer>
         </div>
       </div>
       <noscript><p class="preview-note">Enable JavaScript to try the controls.</p></noscript>
@@ -190,6 +206,7 @@
       <div><h3>See what’s left</h3><p>Five-hour and weekly quotas, with a countdown to each reset.</p></div>
       <div><h3>Keep accounts together</h3><p>Keep Codex and Claude accounts together. Choose whose usage to view.</p></div>
       <div><h3>Find available resets</h3><p>See the earned resets reported by Codex, alongside your usage.</p></div>
+      <div><h3>Keep your Mac awake</h3><p>Click the coffee cup to prevent idle sleep while you work. Click again to turn it off.</p></div>
     </div>
   </section>
 
@@ -219,6 +236,7 @@
       <details><summary>Can I monitor multiple Codex accounts?</summary><p>Yes. Connect each OpenAI account separately, optionally choosing a Chrome profile for sign-in, then select whose Codex usage to view. Credentials stay on your Mac.</p></details>
       <details><summary>Does choosing an account switch Codex too?</summary><p>It selects the usage you’re viewing in Usage Desk. Your active Codex desktop, CLI, and T3 sign-ins stay unchanged.</p></details>
       <details><summary>Can Usage Desk redeem an earned reset?</summary><p>Usage Desk displays the earned resets returned by Codex. It does not redeem them or run model requests.</p></details>
+      <details><summary>What does the coffee button do?</summary><p>In the Mac app, it prevents idle system sleep until you turn it off or quit Usage Desk. The coffee keeps moving while it’s on. Display sleep, closing the lid, and manually putting your Mac to sleep still follow macOS settings. It starts off each time you open the app. On this website, the button only previews the animation.</p></details>
       <details><summary>Is it free?</summary><p>Yes. The app and its original artwork are MIT licensed. OpenAI and Anthropic subscriptions are separate.</p></details>
     </div>
   </section>

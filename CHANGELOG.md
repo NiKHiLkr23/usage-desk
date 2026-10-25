@@ -2,6 +2,9 @@
 
 ## Unreleased — 0.1.1
 
+- Optional coffee button keeps your Mac awake until toggled off or the app quits, with a continuous Pour animation, Reduce Motion support, and no change to display-sleep settings.
+- Matching interactive coffee animation on the website, with clear browser-only behavior.
+
 - Keep System appearance aligned with macOS when the menu-bar anchor has a different appearance.
 
 - Fixed Light/Dark selection changing only the icon when the popover inherits a dark menu-bar appearance. The app applies the choice to the owning window and SwiftUI colors.

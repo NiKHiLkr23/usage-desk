@@ -22,6 +22,7 @@ Select an account in a compact list, or expand the same panel to manage its conn
 - One anchored panel, smooth resizing, full-row account hit targets, and quit confirmation.
 - System appearance by default, optional Light/Dark overrides, and Reduce Motion support.
 - Automatic refresh, wake refresh, optional menu bar percentage, and launch at login.
+- Optional coffee button to prevent idle system sleep until turned off or quit. Display sleep and lid-close behavior stay with macOS; the active Pour animation honors Reduce Motion.
 
 ## Requirements
 

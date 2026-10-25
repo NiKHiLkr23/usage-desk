@@ -29,6 +29,7 @@ struct PendingLogin {
 
 @MainActor final class AccountStore: ObservableObject {
     let isDemo: Bool
+    let keepAwake = KeepAwakeController()
     private let preferences: UserDefaults
     @Published var accounts: [LocalAccount] = []
     @Published var states: [String: AccountState] = [:]
@@ -422,6 +423,7 @@ struct PendingLogin {
     }
 
     func shutdown() {
+        keepAwake.shutdown()
         polling?.cancel(); loginTimeout?.cancel()
         for client in clients.values { Task { await client.close() } }
         for client in claudeClients.values { Task { await client.close() } }
