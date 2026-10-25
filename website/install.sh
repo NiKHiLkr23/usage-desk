@@ -175,8 +175,8 @@ main() {
     finish_step 'Mac requirements checked'
 
     # Bump only after reviewing and testing a new source commit. Never execute a moving branch.
-    source_commit=9366db3b03b1fde7513e1f317e66e454f6d866d2
-    source_version=0.1.0
+    source_commit=bdab4d92a6e24978e460fdc0f9b2cfd129c4b114
+    source_version=0.1.1
     source_repository=https://github.com/NiKHiLkr23/usage-desk.git
     umask 077
     work_dir=$(mktemp -d "${TMPDIR:-/tmp}/usage-desk-install.XXXXXX")

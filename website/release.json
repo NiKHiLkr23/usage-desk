@@ -1,3 +1,6 @@
 {
-  "repository": "https://github.com/NiKHiLkr23/usage-desk"
+  "repository": "https://github.com/NiKHiLkr23/usage-desk",
+  "version": "0.1.1",
+  "tag": "v0.1.1",
+  "sourceCommit": "bdab4d92a6e24978e460fdc0f9b2cfd129c4b114"
 }
