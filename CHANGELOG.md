@@ -2,6 +2,8 @@
 
 ## Unreleased — 0.1.1
 
+- Account-settings gears and moving Preferences sliders use finite hover feedback with Reduce Motion support.
+
 - Per-account editing with saved display names, a direct header shortcut, and retained CLI credentials on removal.
 - Quick account rows open usage immediately and show quota/reset summaries; Add account preselects Codex or Claude.
 - Successful connections open usage automatically; failed or mismatched connections stay in account management.

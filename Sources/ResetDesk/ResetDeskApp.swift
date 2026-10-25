@@ -80,8 +80,7 @@ struct DeskRootView: View {
                     Button { Task { await store.refresh(store.selected?.id ?? "current") } } label: { Image(systemName: "arrow.clockwise") }
                         .buttonStyle(DeskIconButton()).disabled(store.selectedState.isLoading).help("Refresh usage").accessibilityLabel("Refresh usage")
                 }
-                Button { navigation.showPreferences() } label: { Image(systemName: "slider.horizontal.3") }
-                    .buttonStyle(DeskIconButton()).help("Preferences").accessibilityLabel("Preferences")
+                AnimatedDeskIconButton(kind: .preferences, title: "Preferences") { navigation.showPreferences() }
                     .disabled(navigation.page == .preferences)
                 AppearanceButton()
             }.padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 12)

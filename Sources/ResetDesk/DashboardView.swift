@@ -104,13 +104,10 @@ struct DashboardView: View {
                 .accessibilityAddTraits(store.selected?.id == account.id ? .isSelected : [])
                 .accessibilityLabel("\(account.provider.title), \(account.label), \(summary.title), \(summary.detail ?? "")")
                 .help("View usage for \(account.label)")
-            Button {
+            AnimatedDeskIconButton(kind: .gear, title: "Account settings for \(account.label)") {
                 navigation.accountScrollID = account.id
                 AppWindows.showAccounts(store, selectedID: account.id)
-            } label: { Image(systemName: summary.needsConnection ? "arrow.clockwise" : "pencil") }
-                .buttonStyle(DeskIconButton()).padding(.trailing, 4)
-                .help(summary.needsConnection ? "Reconnect \(account.label)" : "Edit \(account.label)")
-                .accessibilityLabel(summary.needsConnection ? "Reconnect \(account.label)" : "Edit \(account.label) account")
+            }.padding(.trailing, 4)
         }.background(store.selected?.id == account.id ? DeskTheme.line : .clear, in: RoundedRectangle(cornerRadius: 8))
             .contextMenu {
                 Button("View usage") { store.selectedID = account.id; navigation.showUsage() }
