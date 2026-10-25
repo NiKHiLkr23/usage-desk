@@ -8,6 +8,7 @@ struct ClaudeAccountConnectionView: View {
     var created: (String) -> Void
     var remove: (LocalAccount) -> Void
     @State private var error: String?
+    @State private var reconnecting = false
     private var state: AccountState { store.states[account?.id ?? ""] ?? AccountState() }
 
     var body: some View {
@@ -59,13 +60,20 @@ struct ClaudeAccountConnectionView: View {
                 HStack {
                     Button("View usage") { if let account { store.selectedID = account.id }; AppWindows.showDashboard(store) }.buttonStyle(AccentButton())
                     Button("Refresh") { if let account { Task { await store.refresh(account.id) } } }
+                    Button("Reconnect") { reconnecting.toggle() }
+                }
+                if reconnecting {
+                    copyCommandButton
+                    Text("Run the command in Terminal to sign in again, then refresh the connection here.")
+                        .font(.system(size: 10)).foregroundStyle(DeskTheme.muted)
+                    Button("Refresh connection") { if let account { Task { await store.refreshClaudeConnection(account.id) } } }
                 }
             } else {
                 Text("Sign in through Claude CLI, then refresh here.").font(.system(size: 12, weight: .medium))
                 copyCommandButton
                 Text("Paste the command in Terminal. Claude opens its own browser sign-in; Usage Desk never asks for your password.")
                     .font(.system(size: 10)).foregroundStyle(DeskTheme.muted)
-                Button("Refresh connection") { if let account { Task { await store.refresh(account.id) } } }.buttonStyle(AccentButton())
+                Button("Refresh connection") { if let account { Task { await store.refreshClaudeConnection(account.id) } } }.buttonStyle(AccentButton())
             }
             if let error = error ?? state.error {
                 if state.info != nil { copyCommandButton }

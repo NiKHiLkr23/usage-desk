@@ -17,6 +17,11 @@ import ResetDeskCore
                 CommandGroup(replacing: .appSettings) {
                     Button("Preferences…") { AppWindows.showSettings(store) }.keyboardShortcut(",")
                 }
+                CommandMenu("Navigate") {
+                    Button("Usage") { AppWindows.showTab(store, tab: "usage") }.keyboardShortcut("1")
+                    Button("Resets") { AppWindows.showTab(store, tab: "resets") }.keyboardShortcut("2")
+                    Button("Accounts") { AppWindows.showTab(store, tab: "accounts") }.keyboardShortcut("3")
+                }
             }
     }
 }
@@ -27,6 +32,7 @@ import ResetDeskCore
     @Published var accountSelection: String?
     @Published var usageTab = "usage"
     @Published var resetTab = "earned"
+    @Published var accountScrollID: String?
     @Published var executableDraft: String?
     @Published var claudeExecutableDraft: String?
     private var accountDrafts: [String: AccountFormDraft] = [:]
@@ -42,11 +48,15 @@ import ResetDeskCore
         accountSelection = id
     }
     func manageAccounts(selectedID: String?) {
-        usageTab = "accounts"
         accountSelection = selectedID
         page = .accounts
     }
-    func showUsage() { usageTab = "usage"; page = .usage }
+    func addAccount(provider: AccountProvider) {
+        draft(for: nil).provider = provider
+        manageAccounts(selectedID: nil)
+    }
+    func showTab(_ tab: String) { usageTab = tab; page = .usage }
+    func showUsage() { showTab("usage") }
     private var returnPage: Page = .usage
     func showPreferences() { if page != .preferences { returnPage = page }; page = .preferences }
     func back() { page = page == .preferences ? returnPage : .usage }
@@ -84,6 +94,10 @@ struct DeskRootView: View {
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(DeskTheme.background).foregroundStyle(DeskTheme.text).tint(DeskTheme.text).deskAppearance()
+            .onChange(of: store.connectionCompleted) { _, connection in
+                guard connection != nil else { return }
+                navigation.showUsage()
+            }
     }
 }
 
@@ -161,6 +175,8 @@ struct DeskRootView: View {
         navigation.manageAccounts(selectedID: selectedID)
         show(store)
     }
+    static func showTab(_ store: AccountStore, tab: String) { navigation.showTab(tab); show(store) }
+    static func addAccount(_ store: AccountStore, provider: AccountProvider) { navigation.addAccount(provider: provider); show(store) }
     static func showSettings(_ store: AccountStore) { navigation.showPreferences(); show(store) }
 
     private static func resize() {
@@ -189,6 +205,30 @@ struct DeskRootView: View {
 }
 
 @MainActor private final class DeskHostingController: NSHostingController<DeskRootView> {
+    private var keyMonitor: Any?
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        guard keyMonitor == nil else { return }
+        // Menu-bar apps have no persistent main window. Route shortcuts only while
+        // this popover owns the key event, leaving browser and terminal typing alone.
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self, event.window === self.view.window,
+                  event.modifierFlags.intersection([.command, .control, .option, .shift]) == .command else { return event }
+            switch event.charactersIgnoringModifiers {
+            case "1": self.rootView.navigation.showTab("usage")
+            case "2": self.rootView.navigation.showTab("resets")
+            case "3": self.rootView.navigation.showTab("accounts")
+            case ",": self.rootView.navigation.showPreferences()
+            default: return event
+            }
+            return nil
+        }
+    }
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
+        keyMonitor = nil
+    }
     override func cancelOperation(_ sender: Any?) { AppWindows.hide() }
 }
 

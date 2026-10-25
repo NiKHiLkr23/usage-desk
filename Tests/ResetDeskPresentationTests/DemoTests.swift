@@ -21,16 +21,22 @@ final class DemoTests: XCTestCase {
             for scheme in [ColorScheme.light, .dark] {
                 let image = try XCTUnwrap(ProviderIcon.menuImage(for: provider, colorScheme: scheme))
                 XCTAssertEqual(image.size, NSSize(width: 14, height: 14))
-                let pixels = try XCTUnwrap(image.tiffRepresentation.flatMap(NSBitmapImageRep.init(data:)))
+                let cgImage = try XCTUnwrap(image.cgImage(forProposedRect: nil, context: nil, hints: nil))
+                let pixels = NSBitmapImageRep(cgImage: cgImage)
                 var opaque: NSColor?
                 for y in 0..<pixels.pixelsHigh {
                     for x in 0..<pixels.pixelsWide {
-                        if let color = pixels.colorAt(x: x, y: y)?.usingColorSpace(.deviceRGB), color.alphaComponent > 0.9 { opaque = color; break }
+                        if let color = pixels.colorAt(x: x, y: y), color.alphaComponent > 0.999 { opaque = color; break }
                     }
                     if opaque != nil { break }
                 }
                 let color = try XCTUnwrap(opaque, "Provider menu icon must have visible pixels")
-                if scheme == .dark { XCTAssertGreaterThan(color.redComponent, 0.9) }
+                if provider == .claude {
+                    let expected = try XCTUnwrap(DeskTheme.claudeColor.usingColorSpace(.sRGB))
+                    XCTAssertEqual(color.redComponent, expected.redComponent, accuracy: 0.03)
+                    XCTAssertEqual(color.greenComponent, expected.greenComponent, accuracy: 0.03)
+                    XCTAssertEqual(color.blueComponent, expected.blueComponent, accuracy: 0.03)
+                } else if scheme == .dark { XCTAssertGreaterThan(color.redComponent, 0.9) }
                 else { XCTAssertLessThan(color.redComponent, 0.1) }
             }
         }

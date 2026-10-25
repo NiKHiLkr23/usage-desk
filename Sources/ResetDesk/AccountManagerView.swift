@@ -12,32 +12,38 @@ struct AccountManagerView: View {
     var body: some View {
         HStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 15) {
-                ScrollView {
-                    VStack(spacing: 5) {
-                        ForEach(store.accounts) { account in
-                            Button { selection = account.id } label: {
-                                HStack(spacing: 8) {
-                                    ProviderIcon(provider: account.provider, size: 16)
-                                    VStack(alignment: .leading, spacing: 5) {
-                                    Text(account.label).font(.system(size: 12, weight: .medium))
-                                    Text(store.states[account.id]?.info?.email ?? (account.managed ? "Sign-in needed" : "Current CLI"))
-                                        .font(.system(size: 10)).foregroundStyle(DeskTheme.muted).lineLimit(1).truncationMode(.middle)
-                                        .help(store.states[account.id]?.info?.email ?? "Sign-in needed")
-                                    }
-                                }.frame(maxWidth: .infinity, alignment: .leading).padding(11)
-                                    .contentShape(Rectangle())
-                            }.buttonStyle(SidebarAccountButton(selected: selection == account.id))
-                                .accessibilityAddTraits(selection == account.id ? .isSelected : [])
-                        }
-                    }.padding(.horizontal, 8).padding(.top, 12)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 5) {
+                            ForEach(store.accounts) { account in
+                                Button { selection = account.id } label: {
+                                    HStack(spacing: 8) {
+                                        ProviderIcon(provider: account.provider, size: 16)
+                                        VStack(alignment: .leading, spacing: 5) {
+                                        Text(account.label).font(.system(size: 12, weight: .medium))
+                                        Text(store.states[account.id]?.info?.email ?? (account.managed ? "Sign-in needed" : "Current CLI"))
+                                            .font(.system(size: 10)).foregroundStyle(DeskTheme.muted).lineLimit(1).truncationMode(.middle)
+                                            .help(store.states[account.id]?.info?.email ?? "Sign-in needed")
+                                        }
+                                    }.frame(maxWidth: .infinity, alignment: .leading).padding(11)
+                                        .contentShape(Rectangle())
+                                }.buttonStyle(SidebarAccountButton(selected: selection == account.id))
+                                    .accessibilityAddTraits(selection == account.id ? .isSelected : []).id(account.id)
+                            }
+                        }.padding(.horizontal, 8).padding(.top, 12)
+                    }.task(id: selection) {
+                        await Task.yield()
+                        if let selection { proxy.scrollTo(selection, anchor: .center) }
+                    }
                 }
-                Button { selection = nil } label: { Label("Add account", systemImage: "plus") }.buttonStyle(AccentButton()).padding(16)
+                AddAccountMenu(store: store).padding(16)
             }.frame(width: 184).background(DeskTheme.surface)
             Divider().overlay(DeskTheme.line)
             ScrollView {
                 if let id = selection, let account = store.accounts.first(where: { $0.id == id }), !account.managed, account.provider == .codex {
                     VStack(alignment: .leading, spacing: 18) {
-                        Text(account.label).font(.system(size: 26, weight: .medium))
+                        AccountLabelEditor(store: store, account: account, draft: navigation.draft(for: account))
+                        Label("Codex CLI", systemImage: "person.crop.circle").font(.system(size: 13, weight: .medium))
                         Text(store.states[id]?.info?.email ?? "No account email reported").textSelection(.enabled)
                         if let error = store.states[id]?.error { Text(error).foregroundStyle(DeskTheme.amber) }
                         Text("This is the sign-in already used by your Codex CLI. Usage desk reads it without replacing it.").foregroundStyle(DeskTheme.muted)
@@ -83,7 +89,7 @@ struct AddAccountView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 17) {
             HStack {
-                Text(account == nil && profileID == nil ? "Add account" : "Account connection").font(.system(size: 23, weight: .medium)).tracking(-0.5)
+                Text(account == nil && profileID == nil ? "Add account" : "Edit account").font(.system(size: 23, weight: .medium)).tracking(-0.5)
                 Spacer()
             }
             if currentID == nil {
@@ -99,6 +105,7 @@ struct AddAccountView: View {
                     }
                 }
             }
+            if let account { AccountLabelEditor(store: store, account: account, draft: draft) }
             if (account?.provider ?? draft.provider) == .claude {
                 ClaudeAccountConnectionView(store: store, account: account, draft: draft, created: created, remove: remove)
             } else {
@@ -108,7 +115,7 @@ struct AddAccountView: View {
                     Text("Account label").font(.system(size: 11, weight: .medium))
                     TextField("Personal, work, side projects…", text: $draft.label).textFieldStyle(.roundedBorder)
                 }
-            } else { Text(account?.label ?? draft.label).font(.system(size: 15, weight: .medium)) }
+            }
             VStack(alignment: .leading, spacing: 8) {
                 Text("Open sign-in with").font(.system(size: 11, weight: .medium))
                 Picker("Chrome profile", selection: $draft.chrome) {
@@ -140,7 +147,7 @@ struct AddAccountView: View {
             } else if let actual = state?.info?.email {
                 VStack(alignment: .leading, spacing: 7) {
                     Label(mismatched ? "Different account connected" : "Authenticated with OpenAI", systemImage: mismatched ? "exclamationmark.triangle" : "checkmark.seal")
-                        .font(.system(size: 13, weight: .medium)).foregroundStyle(mismatched ? DeskTheme.text : DeskTheme.status)
+                        .font(.system(size: 13, weight: .medium)).foregroundStyle(mismatched ? DeskTheme.amber : DeskTheme.status)
                     Text(actual).font(.system(size: 13)).textSelection(.enabled)
                     Text(mismatched ? "Expected \(draft.email). Reconnect and choose the intended OpenAI account in your browser." : "\(shortPlan(state?.info?.planType)) · Sign-in remains saved when Chrome closes.")
                         .font(.system(size: 11)).foregroundStyle(DeskTheme.muted)

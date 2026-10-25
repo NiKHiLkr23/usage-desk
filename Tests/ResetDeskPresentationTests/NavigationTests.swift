@@ -6,6 +6,7 @@ final class NavigationTests: XCTestCase {
     @MainActor func testManagementBackReturnsToQuickAccountsAndRetainsSelection() async {
         let navigation = DeskNavigation()
         let compact = navigation.size
+        navigation.usageTab = "accounts"
         navigation.manageAccounts(selectedID: "work")
         XCTAssertEqual(navigation.accountSelection, "work")
         XCTAssertGreaterThan(navigation.size.width, compact.width)
@@ -21,6 +22,7 @@ final class NavigationTests: XCTestCase {
 
     @MainActor func testAddAccountOpensBlankManagementAndViewUsageLeavesQuickList() async {
         let navigation = DeskNavigation()
+        navigation.usageTab = "accounts"
         navigation.manageAccounts(selectedID: "work")
         navigation.back()
         navigation.manageAccounts(selectedID: nil)
@@ -95,4 +97,36 @@ final class NavigationTests: XCTestCase {
         XCTAssertEqual(navigation.usageTab, "resets")
         XCTAssertEqual(navigation.resetTab, "schedule")
     }
+    @MainActor func testHeaderEditPreservesViewedAccountAndResetsTab() {
+        let store = AccountStore(demo: true)
+        defer { store.shutdown() }
+        let navigation = DeskNavigation()
+        navigation.showTab("resets")
+        navigation.resetTab = "schedule"
+        store.selectedID = "work"
+        navigation.manageAccounts(selectedID: "lab")
+        XCTAssertEqual(store.selectedID, "work", "Editing never switches the viewed account")
+        navigation.back()
+        XCTAssertEqual(navigation.usageTab, "resets")
+        XCTAssertEqual(navigation.resetTab, "schedule")
+    }
+
+    @MainActor func testProviderShortcutRetainsUnfinishedDraftAndAccountPosition() {
+        let navigation = DeskNavigation()
+        navigation.showTab("accounts")
+        navigation.accountScrollID = "lab"
+        navigation.draft(for: nil).label = "Unfinished work account"
+        navigation.addAccount(provider: .claude)
+        XCTAssertEqual(navigation.page, .accounts)
+        XCTAssertNil(navigation.accountSelection)
+        XCTAssertEqual(navigation.draft(for: nil).provider, .claude)
+        XCTAssertEqual(navigation.draft(for: nil).label, "Unfinished work account")
+        navigation.back()
+        XCTAssertEqual(navigation.usageTab, "accounts")
+        XCTAssertEqual(navigation.accountScrollID, "lab")
+        navigation.showTab("usage")
+        XCTAssertEqual(navigation.page, .usage)
+        XCTAssertEqual(navigation.usageTab, "usage")
+    }
+
 }

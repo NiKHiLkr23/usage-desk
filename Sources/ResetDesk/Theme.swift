@@ -26,8 +26,13 @@ enum DeskTheme {
     static let track = color("desk.track", light: 0xe2e2e2, dark: 0x3b3b3b)
     static let button = color("desk.button", light: 0x171717, dark: 0xf2f2f2)
     static let buttonText = color("desk.buttonText", light: 0xffffff, dark: 0x171717)
-    // Attention is conveyed by its label and symbol, keeping the interface monochrome.
-    static let amber = text
+    static let amber = color("desk.warning", light: 0x946200, dark: 0xf0bb62)
+    static let danger = color("desk.danger", light: 0xb42318, dark: 0xff9b91)
+    static let claude = Color(nsColor: claudeColor)
+    static let claudeColor = NSColor(srgbRed: 217.0 / 255, green: 119.0 / 255, blue: 87.0 / 255, alpha: 1)
+    static func quota(_ remaining: Double) -> Color {
+        remaining <= 0 ? danger : remaining <= 20 ? amber : accent
+    }
 }
 
 private struct DeskAppearanceModifier: ViewModifier {

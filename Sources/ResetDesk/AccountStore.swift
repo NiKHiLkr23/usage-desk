@@ -14,6 +14,11 @@ struct AccountState {
     var unsupported = false
 }
 
+struct AccountConnection: Equatable {
+    let id = UUID()
+    let accountID: String
+}
+
 struct PendingLogin {
     var accountID: String
     var flow = BrowserLoginSession()
@@ -31,6 +36,8 @@ struct PendingLogin {
     @Published var selectedID: String { didSet { preferences.set(selectedID, forKey: "selectedAccount") } }
     @Published var pendingLogin: PendingLogin?
     @Published var message: String?
+    @Published private(set) var connectionCompleted: AccountConnection?
+    private var awaitingClaudeConnection: Set<String> = []
     @Published var launchAtLogin = SMAppService.mainApp.status == .enabled
     @Published var refreshInterval: Int { didSet { preferences.set(refreshInterval, forKey: "refreshInterval") } }
     @Published var showMenuPercent: Bool { didSet { preferences.set(showMenuPercent, forKey: "showMenuPercent") } }
@@ -72,7 +79,7 @@ struct PendingLogin {
             return
         }
         let cliHome = ProcessInfo.processInfo.environment["CODEX_HOME"] ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".codex").path
-        accounts = [LocalAccount(id: "current", label: "Current Codex account", home: cliHome, managed: false)]
+        accounts = [LocalAccount(id: "current", label: defaults.string(forKey: "currentAccountLabel") ?? "Current Codex account", home: cliHome, managed: false)]
         do { accounts += try storage.load() }
         catch { storageWritable = false; message = "Saved account settings could not be read. They have not been overwritten. Check accounts.json in ResetDesk’s Application Support folder." }
         if !accounts.contains(where: { $0.id == selectedID }) { selectedID = "current" }
@@ -199,13 +206,57 @@ struct PendingLogin {
         current.updated = read.usage == nil ? nil : Date()
         current.error = nil
         states[account.id] = current
+        if awaitingClaudeConnection.contains(account.id), read.info != nil, read.usage != nil {
+            awaitingClaudeConnection.remove(account.id)
+            completeConnection(account.id)
+        }
+    }
+
+    func renameAccount(_ id: String, label: String) throws {
+        guard let index = accounts.firstIndex(where: { $0.id == id }) else { throw DeskError.message("This account is no longer available.") }
+        let label = try Self.validatedLabel(label)
+        guard isDemo || storageWritable else { throw DeskError.message("Repair saved account settings before editing an account.") }
+        var updated = accounts
+        updated[index].label = label
+        if !isDemo {
+            if id == "current" { preferences.set(label, forKey: "currentAccountLabel") }
+            else { try storage.save(updated) }
+        }
+        accounts = updated
+    }
+
+    static func validatedLabel(_ value: String) throws -> String {
+        let label = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !label.isEmpty, label.count <= 80, label.rangeOfCharacter(from: .controlCharacters) == nil else {
+            throw DeskError.message("Enter a label of up to 80 characters without line breaks.")
+        }
+        return label
+    }
+
+    /// Publish navigation only after an authenticated, usable response. Failed or
+    /// mismatched sign-ins stay in management with their error and recovery actions.
+    func completeConnection(_ id: String) {
+        guard accounts.contains(where: { $0.id == id }), let state = states[id], state.info != nil,
+              state.usage != nil, !state.signedOut, !state.unsupported, state.error == nil else { return }
+        if let expected = accounts.first(where: { $0.id == id })?.expectedEmail,
+           let actual = state.info?.email, expected.caseInsensitiveCompare(actual) != .orderedSame {
+            message = "A different account connected. Check the account details before continuing."
+            return
+        }
+        selectedID = id
+        message = "Account connected."
+        connectionCompleted = AccountConnection(accountID: id)
+    }
+
+    func refreshClaudeConnection(_ id: String) async {
+        awaitingClaudeConnection.insert(id)
+        await refresh(id)
     }
 
     /// Track an existing CLI profile; Claude owns browser login and credentials.
     func connectClaude(label: String, home: String) throws -> String {
         guard !isDemo, storageWritable else { throw DeskError.message("Account changes are unavailable in this mode.") }
-        let label = label.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !label.isEmpty, label.count <= 80 else { throw DeskError.message("Enter a label of up to 80 characters.") }
+        let label = try Self.validatedLabel(label)
         guard accounts.count < 12 else { throw DeskError.message("You can track up to 12 profiles.") }
         guard home.rangeOfCharacter(from: .controlCharacters) == nil else { throw DeskError.message("Choose a valid Claude configuration folder.") }
         let folder = URL(fileURLWithPath: NSString(string: home).expandingTildeInPath).standardizedFileURL
@@ -218,20 +269,20 @@ struct PendingLogin {
         }
         let account = LocalAccount(label: label, home: folder.path, managed: false, provider: .claude)
         try storage.save(accounts + [account])
-        accounts.append(account); selectedID = account.id; states[account.id] = AccountState()
+        accounts.append(account); states[account.id] = AccountState()
+        awaitingClaudeConnection.insert(account.id)
         return account.id
     }
 
     func createAccount(label: String, chromeProfile: String?, expectedEmail: String?) throws -> String {
         guard !isDemo else { throw DeskError.message("Demo mode uses sample accounts. Open the regular app to connect your own.") }
         guard storageWritable else { throw DeskError.message("Repair saved account settings before adding an account.") }
-        let label = label.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !label.isEmpty, label.count <= 80 else { throw DeskError.message("Enter a label of up to 80 characters.") }
+        let label = try Self.validatedLabel(label)
         guard accounts.count < 12 else { throw DeskError.message("You can track up to 12 profiles.") }
         let email = expectedEmail?.trimmingCharacters(in: .whitespacesAndNewlines)
         let account = try storage.makeAccount(label: label, chromeProfile: chromeProfile, expectedEmail: email?.isEmpty == false ? email : nil)
         try storage.save(accounts + [account])
-        accounts.append(account); selectedID = account.id; states[account.id] = AccountState(signedOut: true)
+        accounts.append(account); states[account.id] = AccountState(signedOut: true)
         return account.id
     }
 
@@ -326,10 +377,8 @@ struct PendingLogin {
         if completion.success {
             Task {
                 await refresh(accountID)
-                selectedID = accountID
-                if let info = states[accountID]?.info, states[accountID]?.error == nil {
-                    message = info.email.map { "Connected \($0)." } ?? "Account connected."
-                } else if states[accountID]?.error == nil {
+                completeConnection(accountID)
+                if states[accountID]?.info == nil, states[accountID]?.error == nil {
                     states[accountID]?.error = "Sign-in finished but no account was returned. Retry sign-in."
                 }
             }
@@ -348,6 +397,7 @@ struct PendingLogin {
         await clients.removeValue(forKey: id)?.close()
         await claudeClients.removeValue(forKey: id)?.close()
         states.removeValue(forKey: id)
+        awaitingClaudeConnection.remove(id)
         // Local credentials are retained. Removing a card never logs out or
         // deletes the user's Codex authentication.
     }
