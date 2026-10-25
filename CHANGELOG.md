@@ -2,7 +2,7 @@
 
 ## Unreleased — 0.1.1
 
-- Selected tab backgrounds glide between items with a short transition, including keyboard selection and Reduce Motion support.
+- A persistent selected-tab pill glides between items, including keyboard selection and Reduce Motion support.
 
 - Account-settings gears and Preferences sliders move forward once on hover, hold their position, and reset on exit, with Reduce Motion support.
 

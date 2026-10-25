@@ -127,7 +127,6 @@ struct DeskTabs<Value: Hashable>: View {
     @Binding var selection: Value
     let items: [(Value, String, String)]
     var onSelect: ((Value) -> Void)? = nil
-    @Namespace private var selectionMotion
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
         HStack(spacing: 4) {
@@ -136,20 +135,25 @@ struct DeskTabs<Value: Hashable>: View {
                     Label(title, systemImage: symbol).font(.system(size: 11, weight: .medium))
                         .frame(maxWidth: .infinity).padding(.vertical, 9)
                         .foregroundStyle(selection == value ? DeskTheme.buttonText : DeskTheme.muted)
-                        .background {
-                            if selection == value {
-                                Capsule().fill(DeskTheme.button)
-                                    .matchedGeometryEffect(id: "selected-tab", in: selectionMotion)
-                                    .transition(.identity)
-                            }
-                        }
+                        .animation(reduceMotion ? nil : .easeInOut(duration: 0.28), value: selection == value)
                         .contentShape(Capsule())
                 }.buttonStyle(.plain).accessibilityAddTraits(selection == value ? .isSelected : [])
             }
+        }.background {
+            GeometryReader { geometry in
+                if let index = items.firstIndex(where: { $0.0 == selection }) {
+                    let gap: CGFloat = 4
+                    let width = max(0, (geometry.size.width - gap * CGFloat(items.count - 1)) / CGFloat(items.count))
+                    // One persistent shape moves behind all buttons. Its identity
+                    // never changes when selection moves between native controls.
+                    Capsule().fill(DeskTheme.button)
+                        .frame(width: width, height: geometry.size.height)
+                        .offset(x: CGFloat(index) * (width + gap))
+                        .animation(reduceMotion ? nil : .easeInOut(duration: 0.28), value: selection)
+                        .allowsHitTesting(false)
+                }
+            }
         }.padding(4).background(DeskTheme.surface, in: Capsule())
-            // Scope motion to the tab strip: page content switches immediately.
-            // A separate namespace per strip keeps nested reset tabs independent.
-            .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: selection)
     }
 }
 
