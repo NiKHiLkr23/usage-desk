@@ -175,7 +175,7 @@ main() {
     finish_step 'Mac requirements checked'
 
     # Bump only after reviewing and testing a new source commit. Never execute a moving branch.
-    source_commit=3d120ae6dfab05319aa631753479a74db180a689
+    source_commit=b9a899a7afef245ce3f82836252d45b9ed0692e2
     source_version=0.1.1
     source_repository=https://github.com/NiKHiLkr23/usage-desk.git
     umask 077
