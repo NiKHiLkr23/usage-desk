@@ -22,11 +22,15 @@ for(const filename of ['index.html','privacy.html','brand.html','404.html']){
 }
 const html=await read('index.html');
 for(const [,panel]of html.matchAll(/aria-controls="([^"]+)"/g)){assert.ok(html.includes(`id="${panel}"`));checks++}
-assert.ok(html.includes('Actual macOS app · Sample account data.'));assert.ok(html.includes('assets/showcase-usage.png'));assert.ok(html.includes('prefers-reduced-motion')||(await read('style.css')).includes('prefers-reduced-motion'));checks+=2;
-execFileSync(process.execPath,['--check',path.join(site,'app.js')]);checks++;
+assert.ok(!html.includes('<figcaption>Interactive preview'));assert.ok(html.includes('data-app-preview'));assert.ok(!html.includes('assets/showcase-'));assert.ok(html.includes('prefers-reduced-motion')||(await read('style.css')).includes('prefers-reduced-motion'));checks+=4;
+for (const name of ['app.js','theme.js','app-preview.js']) { execFileSync(process.execPath,['--check',path.join(site,name)]);checks++; }
+execFileSync(process.execPath,['--check',path.join(site,'analytics.js')]);
+execFileSync(process.execPath,[path.join(root,'scripts/version.mjs'),'--check'],{stdio:'inherit'});
+execFileSync(process.execPath,[path.join(root,'scripts/check-analytics.mjs')],{stdio:'inherit'});
+checks+=3;
 execFileSync(process.execPath,[path.join(root,'scripts/check-installer.mjs')],{stdio:'inherit'});checks++;
 assert.ok(html.includes('curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh'));checks++;
-const install=await read('install.sh');assert.match(install,/source_commit=[a-f0-9]{40}/);checks++;
+const install=await read('install.sh');assert.match(install,/source_commit=[a-f0-9]{40}/);assert.match(install,/source_version=\d+\.\d+\.\d+/);checks+=2;
 // Keep the production domain, crawler discovery, and share cards consistent.
 const origin='https://usage-desk.nikhilkr.in';
 const pages=new Map([['index.html','/'],['privacy.html','/privacy.html'],['brand.html','/brand.html']]);
@@ -95,6 +99,12 @@ assert.match(await read('404.html'),/<meta name="robots" content="noindex">/);ch
 
 const release=JSON.parse(await read('release.json'));
 if(release.repository!==null){assert.match(release.repository,/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/?$/)}checks++;
+assert.equal(release.version, install.match(/source_version=(\d+\.\d+\.\d+)/)?.[1]);
+assert.equal(release.sourceCommit, install.match(/source_commit=([a-f0-9]{40})/)?.[1]);
+assert.equal(release.tag, `v${release.version}`);
+assert.equal(execFileSync('git',['-C',root,'show',`${release.sourceCommit}:VERSION`],{encoding:'utf8'}).trim(),release.version,'Installer pin must identify a real committed app version');
+checks+=4;
+
 // Check the publishable set, not ignored builds or real user storage.
 const files=execFileSync('git',['-C',root,'ls-files','--cached','--others','--exclude-standard','-z'],{encoding:'utf8'}).split('\0').filter(Boolean);
 const privateNames=/^(auth|accounts)\.json$|\.(p12|p8|keychain-db|mobileprovision)$/i;

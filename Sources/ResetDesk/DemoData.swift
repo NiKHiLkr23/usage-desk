@@ -8,7 +8,7 @@ extension AccountStore {
         accounts = [
             LocalAccount(id: "current", label: "Current Codex account", home: "/demo/current", managed: false),
             LocalAccount(id: "work", label: "Work", home: "/demo/work", expectedEmail: "work@example.com"),
-            LocalAccount(id: "lab", label: "Side projects", home: "/demo/lab", expectedEmail: "projects@example.com")
+            LocalAccount(id: "lab", label: "Side projects", home: "/demo/lab", expectedEmail: "projects@example.com", provider: .claude)
         ]
         selectedID = "current"
         executablePath = "/usr/local/bin/codex"
@@ -27,8 +27,14 @@ extension AccountStore {
             "grantedAt":\(now - 86400),"expiresAt":\(now + 604800)}]}}
             """
             let info = try? JSONDecoder().decode(AccountRead.self, from: Data(read.utf8))
-            let snapshot = try? JSONDecoder().decode(UsageSnapshot.self, from: Data(usage.utf8))
-            states[account.id] = AccountState(info: info?.account, usage: snapshot, updated: Date())
+            var snapshot = try? JSONDecoder().decode(UsageSnapshot.self, from: Data(usage.utf8))
+            if account.provider == .claude {
+                let sessionReset = ISO8601DateFormatter().string(from: Date(timeIntervalSince1970: now + 8400))
+                let weeklyReset = ISO8601DateFormatter().string(from: Date(timeIntervalSince1970: now + 172800))
+                let data = Data("{\"subscription_type\":\"pro\",\"rate_limits_available\":true,\"rate_limits\":{\"five_hour\":{\"utilization\":18,\"resets_at\":\"\(sessionReset)\"},\"seven_day\":{\"utilization\":42,\"resets_at\":\"\(weeklyReset)\"}}}".utf8)
+                snapshot = try? JSONDecoder().decode(ClaudeUsageResponse.self, from: data).snapshot()
+            }
+            states[account.id] = AccountState(info: account.provider == .claude ? AccountRead.Info(type: "claude", email: emails[index], planType: "pro") : info?.account, usage: snapshot, updated: Date())
         }
     }
 }

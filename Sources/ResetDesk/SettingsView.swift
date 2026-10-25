@@ -28,9 +28,31 @@ struct SettingsView: View {
                     Task { await store.resetConnections() }
                 }.disabled(store.pendingLogin != nil)
             }
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Claude CLI executable").font(.system(size: 11, weight: .medium))
+                HStack {
+                    TextField("/path/to/claude", text: Binding(get: { navigation.claudeExecutableDraft ?? store.claudeExecutablePath }, set: { navigation.claudeExecutableDraft = $0 }))
+                        .textFieldStyle(.roundedBorder).font(.system(size: 11, design: .monospaced))
+                    Button("Choose…") {
+                        let panel = NSOpenPanel(); panel.canChooseDirectories = false; panel.canChooseFiles = true
+                        if panel.runModal() == .OK { navigation.claudeExecutableDraft = panel.url?.path }
+                    }
+                }
+                Button("Save and reconnect") {
+                    let path = navigation.claudeExecutableDraft ?? store.claudeExecutablePath
+                    guard FileManager.default.isExecutableFile(atPath: path) else { store.message = "Choose an executable Claude CLI file."; return }
+                    store.claudeExecutablePath = path
+                    Task { await store.resetConnections() }
+                }.disabled(store.pendingLogin != nil)
+            }
             if let message = store.message { Text(message).font(.system(size: 11)).foregroundStyle(DeskTheme.amber).textSelection(.enabled) }
-            Text("Account credentials are managed locally by Codex. No Node server, cloud database, analytics, or browser extension is used.")
+            Text("Sign-ins are managed by Codex and Claude CLI. Usage Desk has no analytics or cloud account.")
                 .font(.system(size: 10)).foregroundStyle(DeskTheme.muted)
+            HStack {
+                Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Development")")
+                Spacer()
+                Link("Release notes", destination: URL(string: "https://github.com/NiKHiLkr23/usage-desk/releases")!)
+            }.font(.system(size: 10)).foregroundStyle(DeskTheme.muted)
         }.font(.system(size: 12)).padding(.top, 12).frame(maxWidth: .infinity, alignment: .leading).background(DeskTheme.background).foregroundStyle(DeskTheme.text).tint(DeskTheme.text).buttonStyle(DeskButton()).deskAppearance()
     }
 }

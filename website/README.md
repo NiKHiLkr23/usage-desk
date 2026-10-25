@@ -1,8 +1,10 @@
 # Usage Desk landing page
 
-Buildless HTML, CSS, and JavaScript. No framework, external fonts, analytics, or runtime dependencies.
-The hero uses native captures rendered from the actual SwiftUI app views with isolated sample accounts.
-No hand-built or AI-generated product mockups are used. The caption discloses sample data; the presentation-only Demo badge is omitted from captures.
+Buildless HTML, CSS, and JavaScript. No framework, external fonts, or runtime package dependencies. Production-only Vercel Web Analytics
+is isolated from the native app; see [analytics setup](../docs/ANALYTICS.md).
+The hero uses a native-style HTML/CSS/JS preview with isolated sample accounts. Sample-data
+behavior is explained on the Privacy page; the hero has no preview caption. It never reads or connects real accounts. The public website contains no
+product screenshots; authentic repository screenshots remain separate.
 All links and interactions must remain usable with keyboard and reduced motion.
 
 ## Local preview
@@ -11,7 +13,7 @@ All links and interactions must remain usable with keyboard and reduced motion.
 npm run preview
 ```
 
-The server binds only `127.0.0.1:4320`; set `PORT` to change the port. It serves only `website/`.
+The server binds only `127.0.0.1:4320`; set `PORT` to change the port. It serves only `website/`. Analytics never loads on localhost.
 Run `node scripts/check-website.mjs` for structural, SEO, link, and privacy checks.
 The preview reads production security headers from `vercel.json` and serves the real 404 page.
 Vercel hostname redirects must be checked on the deployed site. Native app tests are separate.
@@ -20,8 +22,7 @@ Vercel hostname redirects must be checked on the deployed site. Native app tests
 
 The GitHub actions link directly to [NiKHiLkr23/usage-desk](https://github.com/NiKHiLkr23/usage-desk)
 in a new tab, including with JavaScript disabled. The same verified repository URL is recorded in
-`release.json` for tooling. The website does not fetch release metadata. No app installer or preview
-ZIP is promoted, on localhost or in production.
+`release.json` for tooling. The website does not fetch release metadata. No prebuilt app download or preview ZIP is promoted, on localhost or in production.
 
 `install.sh` is a POSIX shell source installer, served as plain text with `noindex` and
 revalidation headers. It fetches a fixed public Git commit, verifies it, builds with the
@@ -40,7 +41,7 @@ website review downloads were preserved outside the web root under ignored `.loc
 ## Design
 
 The page uses a neutral palette, a single Helvetica Neue type family with local fallbacks,
-and the real app capture as its main visual. Interface icons are limited to meaningful actions: theme, copy, and GitHub star. The setup sequence is numbered because its order matters; feature labels are not.
+and an interactive app preview as its main visual. Interface icons are limited to real controls and provider identity. The setup sequence is numbered because its order matters; feature labels are not.
 Keyboard focus, 44px controls, system appearance, and reduced motion are retained.
 
 ## Vercel deployment
@@ -78,13 +79,19 @@ The install command is selectable with JavaScript disabled. JavaScript enables i
 with success feedback and a selection/manual-copy fallback when clipboard access is denied.
 The GitHub star action opens the repository; the site does not star automatically or show a fabricated count.
 
-The preview uses keyboard-accessible Usage, Accounts, and Resets tabs with real native view
-captures. Without JavaScript, the Usage image remains visible. All three images have equal
-dimensions, so changing tabs does not resize the page. See `DESIGN.md` for the interaction decisions.
+The preview supports Usage, Resets, Accounts, sample account selection, display-name edits, and
+Preferences. Add account, sign-in, removal, CLI configuration, and OS-only actions are omitted.
+Refresh demonstrates feedback without fetching or changing sample quotas. Refresh interval is a
+sample setting, not a live polling promise. Changes stay in memory except the website theme.
+Without JavaScript, default Usage values remain readable. Keyboard arrows, Home/End, menu Escape,
+visible focus and Save feedback are supported. See `DESIGN.md` for decisions and native/web differences.
 
-Regenerate the showcase captures on macOS with `zsh scripts/capture-website.sh`. The tool
-uses the native views from the current committed source, changes only its temporary entry
-point, and runs `AccountStore(demo: true)` in a temporary process. It never opens the live app
-or reads real account storage. The output is 840 × 1000 PNG at 2× scale. Inspect all images
-before publishing. The capture tool omits the presentation-only Demo badge in its temporary
-source copy; sample data and all demo safety guards stay active. The installed app is unchanged.
+`theme.js` runs before styles to restore the existing System-first preference. Both header and
+preview controls use it. `preview.css` scopes native tokens; `app-preview.js` owns sample state only.
+The circular theme reveal uses feature-detected View Transitions, with immediate Reduce Motion and
+unsupported-browser fallbacks. Hover animations move forward once and reset instantly on exit.
+The original screenshot schema property was removed; social cards remain brand-only.
+
+For authentic repository captures, `zsh scripts/capture-website.sh` renders committed SwiftUI views
+with isolated sample data into `assets/screenshots/native/`, outside the public website. Inspect
+captures before publication; the tool never reads live accounts or changes the installed app.

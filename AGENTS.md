@@ -8,7 +8,7 @@ are compatibility contracts. Avoid changing them without a migration.
 
 - `Sources/ResetDesk`: SwiftUI views, AppKit presentation, AccountStore.
 - `Sources/ResetDeskCore`: storage, JSON-RPC, models, login correlation.
-- `website`: buildless landing page and sanitized real app captures.
+- `website`: buildless landing page and interactive sample app preview.
 - `assets/brand`: original vector masters and exported brand files.
 - Native tests: `swift test --scratch-path .build --cache-path .cache`.
 - Build: `zsh scripts/build.sh` (`--universal` and `--demo` are optional).
@@ -28,7 +28,7 @@ Reuse semantic colors and native component styles. Preserve System theme as defa
 Reduce Motion support, full-row account hit targets, and draft/login lifetime on dismissal.
 The Accounts tab is a compact selector; Manage/Add account expand the same panel.
 The original logo has one green first segment and two empty outlined segments.
-Use actual app screenshots for product imagery; permanently redact personal fields and strip metadata. Do not replace app screenshots with generated illustrations or HTML reconstructions.
+The website uses an HTML/CSS/JS app preview, explicitly approved on 2026-10-25. Match native tokens and interactions, explain sample data on the Privacy page, and keep it isolated from real accounts. Keep preview/sample captions out of the hero. Omit sign-in, Add account, removal, CLI paths, and OS-only controls. Theme controls share one System-first setting across the page and preview. Repository screenshots must remain real app captures with permanently redacted fields and stripped metadata; do not use generated product imagery.
 
 Follow the current user's publication instructions. The maintainer approved the initial source
 commit, GitHub push, and website deployment on 2026-10-18. App binaries, signing credentials,

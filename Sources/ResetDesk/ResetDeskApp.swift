@@ -17,6 +17,11 @@ import ResetDeskCore
                 CommandGroup(replacing: .appSettings) {
                     Button("Preferences…") { AppWindows.showSettings(store) }.keyboardShortcut(",")
                 }
+                CommandMenu("Navigate") {
+                    Button("Usage") { AppWindows.showTab(store, tab: "usage") }.keyboardShortcut("1")
+                    Button("Resets") { AppWindows.showTab(store, tab: "resets") }.keyboardShortcut("2")
+                    Button("Accounts") { AppWindows.showTab(store, tab: "accounts") }.keyboardShortcut("3")
+                }
             }
     }
 }
@@ -27,7 +32,9 @@ import ResetDeskCore
     @Published var accountSelection: String?
     @Published var usageTab = "usage"
     @Published var resetTab = "earned"
+    @Published var accountScrollID: String?
     @Published var executableDraft: String?
+    @Published var claudeExecutableDraft: String?
     private var accountDrafts: [String: AccountFormDraft] = [:]
     func draft(for account: LocalAccount?) -> AccountFormDraft {
         let key = account?.id ?? "new"
@@ -41,11 +48,14 @@ import ResetDeskCore
         accountSelection = id
     }
     func manageAccounts(selectedID: String?) {
-        usageTab = "accounts"
         accountSelection = selectedID
         page = .accounts
     }
-    func showUsage() { usageTab = "usage"; page = .usage }
+    func addAccount() {
+        manageAccounts(selectedID: nil)
+    }
+    func showTab(_ tab: String) { usageTab = tab; page = .usage }
+    func showUsage() { showTab("usage") }
     private var returnPage: Page = .usage
     func showPreferences() { if page != .preferences { returnPage = page }; page = .preferences }
     func back() { page = page == .preferences ? returnPage : .usage }
@@ -69,8 +79,7 @@ struct DeskRootView: View {
                     Button { Task { await store.refresh(store.selected?.id ?? "current") } } label: { Image(systemName: "arrow.clockwise") }
                         .buttonStyle(DeskIconButton()).disabled(store.selectedState.isLoading).help("Refresh usage").accessibilityLabel("Refresh usage")
                 }
-                Button { navigation.showPreferences() } label: { Image(systemName: "slider.horizontal.3") }
-                    .buttonStyle(DeskIconButton()).help("Preferences").accessibilityLabel("Preferences")
+                AnimatedDeskIconButton(kind: .preferences, title: "Preferences") { navigation.showPreferences() }
                     .disabled(navigation.page == .preferences)
                 AppearanceButton()
             }.padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 12)
@@ -83,6 +92,11 @@ struct DeskRootView: View {
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(DeskTheme.background).foregroundStyle(DeskTheme.text).tint(DeskTheme.text).deskAppearance()
+            .onChange(of: navigation.page) { _, _ in ThemeRevealTransition.shared.cancel() }
+            .onChange(of: store.connectionCompleted) { _, connection in
+                guard connection != nil else { return }
+                navigation.showUsage()
+            }
     }
 }
 
@@ -141,7 +155,6 @@ struct DeskRootView: View {
             panel.behavior = .transient
             panel.delegate = lifecycle
             let host = DeskHostingController(rootView: DeskRootView(store: store, navigation: navigation))
-            host.sizingOptions = []
             panel.contentViewController = host
             popover = panel
             routeObservation = navigation.$page.dropFirst().receive(on: RunLoop.main).sink { _ in resize() }
@@ -160,6 +173,8 @@ struct DeskRootView: View {
         navigation.manageAccounts(selectedID: selectedID)
         show(store)
     }
+    static func showTab(_ store: AccountStore, tab: String) { navigation.showTab(tab); show(store) }
+    static func addAccount(_ store: AccountStore) { navigation.addAccount(); show(store) }
     static func showSettings(_ store: AccountStore) { navigation.showPreferences(); show(store) }
 
     private static func resize() {
@@ -184,18 +199,76 @@ struct DeskRootView: View {
 }
 
 @MainActor private final class DeskPopoverLifecycle: NSObject, NSPopoverDelegate {
-    func popoverWillClose(_ notification: Notification) { AppWindows.stopResize() }
+    func popoverWillClose(_ notification: Notification) {
+        AppWindows.stopResize()
+        ThemeRevealTransition.shared.cancel()
+    }
 }
 
-@MainActor private final class DeskHostingController: NSHostingController<DeskRootView> {
+/// AppKit owns the presentation surface; SwiftUI owns only its child. Adding an
+/// animation overlay directly to NSHostingView lets SwiftUI discard its backing
+/// layer during appearance updates, even while the NSView remains attached.
+@MainActor final class DeskHostingController: NSViewController {
+    private let hosting: NSHostingController<DeskRootView>
+    private var rootView: DeskRootView { hosting.rootView }
+    private var keyMonitor: Any?
+
+    init(rootView: DeskRootView) {
+        hosting = NSHostingController(rootView: rootView)
+        hosting.sizingOptions = []
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func loadView() {
+        let surface = NSView()
+        surface.wantsLayer = true
+        view = surface
+        addChild(hosting)
+        hosting.view.translatesAutoresizingMaskIntoConstraints = false
+        surface.addSubview(hosting.view)
+        NSLayoutConstraint.activate([
+            hosting.view.leadingAnchor.constraint(equalTo: surface.leadingAnchor),
+            hosting.view.trailingAnchor.constraint(equalTo: surface.trailingAnchor),
+            hosting.view.topAnchor.constraint(equalTo: surface.topAnchor),
+            hosting.view.bottomAnchor.constraint(equalTo: surface.bottomAnchor),
+        ])
+    }
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        guard keyMonitor == nil else { return }
+        // Menu-bar apps have no persistent main window. Route shortcuts only while
+        // this popover owns the key event, leaving browser and terminal typing alone.
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self, event.window === self.view.window,
+                  event.modifierFlags.intersection([.command, .control, .option, .shift]) == .command else { return event }
+            switch event.charactersIgnoringModifiers {
+            case "1": self.rootView.navigation.showTab("usage")
+            case "2": self.rootView.navigation.showTab("resets")
+            case "3": self.rootView.navigation.showTab("accounts")
+            case ",": self.rootView.navigation.showPreferences()
+            default: return event
+            }
+            return nil
+        }
+    }
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
+        keyMonitor = nil
+    }
     override func cancelOperation(_ sender: Any?) { AppWindows.hide() }
 }
 
 @MainActor final class AccountFormDraft: ObservableObject {
+    @Published var provider: AccountProvider
+    @Published var claudeHome: String
     @Published var label: String
     @Published var chrome: String
     @Published var email: String
     init(account: LocalAccount?) {
+        provider = account?.provider ?? .codex
+        claudeHome = account?.home ?? (ProcessInfo.processInfo.environment["CLAUDE_CONFIG_DIR"] ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude").path)
         label = account?.label ?? ""
         chrome = account?.chromeProfile ?? "default-browser"
         email = account?.expectedEmail ?? ""

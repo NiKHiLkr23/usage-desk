@@ -1,6 +1,6 @@
 {
   "name": "usage-desk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Local website preview and brand tooling for Usage Desk",
   "type": "module",
@@ -10,7 +10,11 @@
   "scripts": {
     "preview": "node scripts/preview.mjs",
     "check": "node scripts/check-website.mjs",
-    "assets": "node scripts/generate-assets.mjs"
+    "assets": "node scripts/generate-assets.mjs",
+    "version:check": "node scripts/version.mjs --check",
+    "release:prepare": "node scripts/prepare-release.mjs",
+    "release:check": "node scripts/check-release.mjs",
+    "analytics:check": "node scripts/check-analytics.mjs"
   },
   "devDependencies": {
     "sharp": "0.35.5"

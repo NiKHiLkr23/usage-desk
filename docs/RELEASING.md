@@ -1,47 +1,111 @@
 # Releasing Usage Desk
 
-Nothing in this repository automatically creates a release, commits code, or deploys the website.
-The project uses source-only distribution. The initial source publication and website deployment
-were approved by the maintainer on 2026-10-18.
-Publishing the source and website requires explicit approval and a public repository; Apple
-Developer membership and signing credentials are not prerequisites for that source-only launch.
+Distribution is source only. Publishing a release does not require an Apple Developer account.
+The native app retains its existing bundle ID and local credential paths between releases.
 
-## Before the first push
+## Version and local review
 
-- Review `REVIEW.md`, the MIT license/copyright, documentation, demo screenshots, and brand exports.
-- Run native tests, website checks, a clean build, and a local install test on a spare/demo profile.
-- Confirm `git status --short` contains only source and public assets. Never add `dist/`, `.build/`,
-  `.cache/`, local downloads, credentials, or real account screenshots.
-- Create the intended public `usage-desk` repository. Enable Issues, private vulnerability reporting,
-  and PR checks. Keep default branch protection suitable for community contributions.
-- Add a remote and commit/push **only after the maintainer approves the local review**.
+`VERSION` is the shared semantic version. To bump it:
 
-## Review build (no upload)
+```sh
+node scripts/version.mjs 0.1.1
+npm run version:check
+```
+
+The command synchronizes package metadata, the app plist, website structured data, and its exact CSP hash.
+Increment `CFBundleVersion` in `Support/Info.plist` for a new build. Keep this internal build identifier out of user-facing version labels; Preferences displays only the version.
+Codex's initialization handshake uses the bundled app version. Direct SwiftPM runs report development.
+Keep `CHANGELOG.md` and `docs/releases/v<VERSION>.md` current.
+
+```sh
+swift test --scratch-path .build --cache-path .cache
+zsh scripts/build.sh
+npm run check
+npm run release:check
+```
+
+Normal tests use synthetic data and skip real accounts. Verify Apple silicon and Intel in CI before
+claiming cross-architecture validation. Never stage credentials, private emails, raw auth URLs, local
+account metadata, `.build/`, `.cache/`, `dist/`, or the installed app.
+
+## Prepare the source release
+
+Start from a clean, reviewed commit containing the final native app and release notes:
+
+```sh
+npm run release:prepare
+```
+
+This writes four text assets under ignored `dist/releases/v<VERSION>/`: `install.sh`, `release.json`,
+`RELEASE_NOTES.md`, and `SHA256SUMS`. The installer is pinned to the full source commit, not a moving
+branch. Preparation refuses uncommitted changes and mismatched CI tags. It does not tag, upload,
+commit, push, deploy, or publish. GitHub automatically supplies source ZIP/tar archives for a tag.
+Those archives are source, not installable app binaries.
+
+To prepare the website's copy of the exact same installer and manifest:
+
+```sh
+node scripts/prepare-release.mjs --website
+node scripts/check-website.mjs
+```
+
+Review and commit these distribution-only changes separately. The `sourceCommit` in
+`website/release.json` identifies the app release checkpoint; it may precede later website-only commits.
+If app source changes after preparation, commit and review those changes, then prepare a new pin.
+Do not hand-edit a guessed SHA or point the installer at a branch.
+
+## Tag and draft on GitHub
+
+After local review and source-publication approval, push the branch and land the reviewed work.
+Create an annotated `v<VERSION>` tag at the exact reviewed source commit recorded in the manifest,
+then push that tag. A clean merge should retain the reviewed source checkpoint; if history is rewritten,
+review and regenerate the pin for the actual source snapshot before creating the tag.
+
+The tag-triggered `.github/workflows/release.yml` reuses the native CI checks, verifies the version,
+generates text-only source assets, and creates a **draft** GitHub release. Its write permission is
+limited to the draft job. It refuses to overwrite an existing release. No app binary or Apple
+credential is uploaded. A CI failure prevents draft creation.
+
+Review the draft notes, tag target, text-asset checksums, and clean-Mac source installation before
+publishing the draft. Deploy the reviewed website installer separately, ensuring it targets the same
+source SHA. Verify HTTPS `/install.sh` returns the reviewed text with revalidation and noindex headers.
+Do not claim a release is public merely because its notes or version metadata exist in Git.
+
+## Installer behavior and updates
+
+The installer requires macOS 14+, Swift 6+ and Xcode Command Line Tools, fetches and verifies an
+exact source SHA and version, builds locally, verifies the local signature before and after copying,
+and installs into `~/Applications` without sudo. It refuses existing app paths, including symlinks.
+To update, quit and move only the old `.app` to Trash, then rerun the installer. Account data and
+provider CLI profiles remain in their existing directories; never delete a CLI home to update the app.
+
+The script cleans temporary source and failed partial copies. Build output goes to a private log,
+removed on success or retained with recent details on failure. Interactive runs offer app launch via
+`/dev/tty`; redirected runs never launch it. It never installs the provider CLIs, authenticates accounts,
+removes quarantine, disables Gatekeeper, or records installation/active-user analytics.
+The synthetic installer checks do not prove clean-Mac compatibility; test that separately.
+
+## Repository setup
+
+Keep Issues and private vulnerability reporting available. Add relevant topics such as `macos`,
+`swiftui`, `codex`, `claude`, and `menu-bar`. Require successful CI and PR review on `main` while
+retaining a documented maintainer recovery route. Use existing bug/feature templates and focused
+labels; `.github/release.yml` groups labeled PRs for generated notes. Contributors/languages update
+automatically on GitHub. Packages are not required for this source-distributed Mac app.
+
+## Optional local binary review
 
 ```sh
 zsh scripts/package.sh --universal
 ```
 
-Produces `dist/releases/usage-desk-0.1.0-macos-<arch>.zip` plus SHA-256 checksum.
-This is ad-hoc signed, not notarized, and remains under ignored `dist/releases/`. It is not copied
-into the website or promoted as an installer. Previous website preview artifacts are preserved
-under ignored `.local/`, outside the web root.
-
-## Source-only launch
-
-After maintainer approval, publish the repository with build instructions and configure only the
-`repository` URL in `website/release.json`. Users obtain the source from GitHub and compile it on
-their own Mac. The optional `website/install.sh` automates that local build and user-folder
-installation; it is not a prebuilt installer. Keep the website explicit about Swift, macOS,
-and Codex CLI requirements. Do not
-attach ad-hoc-signed review builds as public installation assets.
+This creates an ad-hoc-signed review ZIP and checksum under ignored `dist/releases/`. Do not attach
+that build as a public installer or copy it into the website.
 
 ## Future signed and notarized distribution
 
-Prerequisites: Apple Developer membership, a Developer ID Application identity in Keychain,
-Xcode's `notarytool`, and an existing `notarytool` Keychain credential profile. Set up the profile
-interactively using Apple's documented workflow; do not store credentials in the repo or shell scripts.
-The native app is not sandboxed and must be able to launch the installed Codex CLI.
+This is a separate distribution decision. It requires Apple Developer membership, a Developer ID
+Application identity, and an interactive `notarytool` Keychain profile. Never commit those credentials.
 
 ```sh
 export USAGE_DESK_SIGNING_IDENTITY='Developer ID Application: YOUR NAME (TEAMID)'
@@ -49,53 +113,9 @@ export USAGE_DESK_NOTARY_PROFILE='usage-desk-notary'
 zsh scripts/package.sh --release
 ```
 
-This explicit release command builds a universal binary, signs with hardened runtime, submits the
-app ZIP to Apple, staples the ticket, validates it and assesses the app, then creates the final ZIP
-and checksum. It does not upload to GitHub or deploy. Inspect any Apple rejection and fix it rather
-than bypassing Gatekeeper or disabling validation.
+The explicit command builds universal, signs with hardened runtime, submits to Apple, staples and
+validates the ticket, assesses the app, and produces a ZIP/checksum. It does not publish. Fix Apple
+rejections rather than bypassing Gatekeeper. Source-only releases do not imply notarized binaries.
 
-## Publish a future installer manually
-
-After validation, create tag `v0.1.0` and a GitHub release with notes from `CHANGELOG.md`.
-Attach only the final distribution ZIP and its checksum. Verify the download and signature on
-another Mac; check Intel compatibility before claiming it has been tested. Add a new, explicitly
-reviewed website download flow and deploy separately. The source-only website ignores binary
-release fields. Never claim a CI-only build is notarized.
-
-Official references:
-- [Apple notarization](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)
-- [GitHub private vulnerability reporting](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository)
-
-## Version changes
-
-Update `CFBundleShortVersionString` and `CFBundleVersion` in `Support/Info.plist`, the protocol
-client version in `CodexClient.swift`, `package.json` / lockfile, release notes, and website metadata
-for each release. Keep the bundle identifier and credential directories stable unless migrating them.
-
-## Maintaining the source installer
-
-`website/install.sh` uses a full `source_commit` SHA rather than executing a moving branch.
-It currently builds commit `9366db3b03b1fde7513e1f317e66e454f6d866d2` (native app version 0.1.0).
-After reviewing and testing a future app source commit, update that pin and the expected commit
-in `scripts/check-installer.mjs`, run the installer scenarios and website checks, and review
-before publishing. The pinned source need not contain the installer itself.
-
-The script installs into `~/Applications`, verifies the local signature before and after copying,
-and refuses existing app paths, including symlinks. It cleans up temporary source and failed
-partial copies. It offers to launch the installed app only after an affirmative response from
-a controlling terminal; redirected/non-interactive runs never launch it. It does not install the
-CLI/toolchain, change authentication, remove quarantine attributes, or disable Gatekeeper.
-It requires network access to GitHub.
-Users need the Codex CLI installed and signed in separately.
-
-Before promoting the command publicly, test on a separate Mac with a supported toolchain and
-verify `/install.sh` serves the reviewed script over HTTPS with plain-text content type. The
-isolated test suite uses synthetic build/network/signature tools; it does not prove a clean-Mac
-build or runtime compatibility. Never substitute an unsigned binary download under this command.
-
-The terminal interface uses a text version of the two-windows logo, real phase indicators,
-and a spinner only on capable terminals. `NO_COLOR` disables color. Known compatible terminals
-receive OSC 8 setup hyperlinks; other terminals get the full URL and an `open` command.
-Build details go into a private temporary log, removed on success. On failure the final
-30 log lines and the retained log path are printed; temporary source and partial apps are removed.
-The launch prompt reads `/dev/tty`, never the curl pipeline. No GUI helper is installed.
+References: [GitHub releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases),
+[Apple notarization](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution).

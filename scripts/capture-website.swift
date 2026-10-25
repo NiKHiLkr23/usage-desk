@@ -12,8 +12,9 @@ import SwiftUI
         for tab in ["usage", "accounts", "resets"] {
             let navigation = DeskNavigation()
             navigation.usageTab = tab
-            let root = DeskRootView(store: store, navigation: navigation).environment(\.colorScheme, .light)
+            let root = DeskRootView(store: store, navigation: navigation).frame(width: 420, height: 500).environment(\.colorScheme, .light)
             let view = NSHostingView(rootView: root)
+            view.sizingOptions = []
             let rect = NSRect(x: 0, y: 0, width: 420, height: 500)
             let window = NSWindow(contentRect: rect, styleMask: [.borderless], backing: .buffered, defer: false)
             window.contentView = view

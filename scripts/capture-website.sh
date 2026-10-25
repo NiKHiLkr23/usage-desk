@@ -21,5 +21,6 @@ cp "$task_repo/scripts/capture-website.swift" "$task_capture_root/Sources/ResetD
 cd "$task_capture_root"
 swift build -c release --scratch-path .build --cache-path .cache -Xswiftc -module-cache-path -Xswiftc .cache/modules
 .build/release/ResetDesk "$task_capture_root/captures"
-cp "$task_capture_root"/captures/showcase-*.png "$task_repo/website/assets/"
+mkdir -p "$task_repo/assets/screenshots/native"
+cp "$task_capture_root"/captures/showcase-*.png "$task_repo/assets/screenshots/native/"
 print 'Captured native app views using sample data. Inspect the three images before publishing.'
