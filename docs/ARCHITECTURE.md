@@ -95,7 +95,8 @@ click-through overlay lasts 480 ms and is removed on completion, rapid replaceme
 dismissal or Reduce Motion changes. Failed capture and missing anchors apply appearance instantly.
 `DeskAppearanceBridge` applies the saved choice when the owning popover attaches and when it changes.
 The theme button also updates that window immediately. An explicit SwiftUI color-scheme environment
-keeps semantic colors in sync; System removes window/application overrides and uses inherited appearance.
+keeps semantic colors in sync; System removes the application override and applies its resolved
+appearance to the popover. A window-scoped observation follows subsequent app appearance changes.
 This avoids inheriting a fixed dark appearance from the menu-bar anchor.
 System remains the default. No screen recording, file export or account operation is involved.
 The website uses the View Transition API for the equivalent reveal, with immediate fallbacks.

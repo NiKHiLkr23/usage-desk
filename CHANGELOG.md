@@ -2,6 +2,8 @@
 
 ## Unreleased — 0.1.1
 
+- Keep System appearance aligned with macOS when the menu-bar anchor has a different appearance.
+
 - Fixed Light/Dark selection changing only the icon when the popover inherits a dark menu-bar appearance. The app applies the choice to the owning window and SwiftUI colors.
 
 - Fixed the native circular theme reveal disappearing during SwiftUI appearance updates; the overlay now uses a stable AppKit surface.

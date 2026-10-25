@@ -51,4 +51,5 @@ persist or transmit the picture. Effective-theme changes only; System remains th
 
 Apply explicit Light/Dark appearance to the owning popover window as well as the app.
 Pass the chosen color scheme into SwiftUI so semantic colors repaint even when the menu-bar
-anchor has its own appearance. System clears both overrides and follows inherited appearance.
+anchor has its own appearance. System clears the application override and resolves the popover appearance from the app,
+rather than its menu-bar anchor. Observe app appearance changes so System keeps following macOS.

@@ -11,7 +11,7 @@ enum DeskAppearance: String, CaseIterable {
     }
     @MainActor func applyToApp(window: NSWindow? = nil) {
         NSApp.appearance = appKitAppearance
-        window?.appearance = appKitAppearance
+        window?.appearance = appKitAppearance ?? NSApp.effectiveAppearance
     }
 }
 
@@ -71,13 +71,25 @@ private struct DeskAppearanceBridge: NSViewRepresentable {
 
 private final class DeskAppearanceView: NSView {
     var choice: DeskAppearance = .system
+    private var appearanceObservation: NSKeyValueObservation?
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+        appearanceObservation = nil
+        guard window != nil else { return }
+        appearanceObservation = NSApp.observe(\.effectiveAppearance) { [weak self] _, _ in
+            Task { @MainActor in
+                guard let self, self.choice == .system else { return }
+                self.synchronize()
+            }
+        }
         synchronize()
     }
     func synchronize() {
-        guard let window, window.appearance?.name != choice.appKitAppearance?.name else { return }
-        window.appearance = choice.appKitAppearance
+        // A popover can inherit its status-item anchor's appearance on macOS 15.
+        // Resolve System from the app, whose override is cleared, instead.
+        let appearance = choice.appKitAppearance ?? NSApp.effectiveAppearance
+        guard let window, window.appearance?.name != appearance.name else { return }
+        window.appearance = appearance
     }
 }
 
