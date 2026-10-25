@@ -8,33 +8,36 @@ struct AnimatedDeskIconButton: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isEnabled) private var enabled
     @State private var hovering = false
-    @State private var pulse = 0
+    @State private var motion = DeskIconMotionFrame()
 
     var body: some View {
         let motionAllowed = !reduceMotion && enabled
-        let icon = kind
         return Button(action: action) {
-            Color.clear.frame(width: 16, height: 16)
-                .keyframeAnimator(initialValue: DeskIconMotionFrame(), trigger: pulse) { _, frame in
-                    DeskMotionGlyph(kind: icon, frame: motionAllowed ? frame : DeskIconMotionFrame())
-                } keyframes: { _ in
-                    KeyframeTrack(\.rotation) {
-                        CubicKeyframe(90, duration: 0.32)
-                        CubicKeyframe(0, duration: 0.40)
-                    }
-                    KeyframeTrack(\.slide) {
-                        CubicKeyframe(1, duration: 0.24)
-                        CubicKeyframe(-0.4, duration: 0.24)
-                        CubicKeyframe(0, duration: 0.24)
-                    }
-                }
+            DeskMotionGlyph(kind: kind, frame: motionAllowed ? motion : DeskIconMotionFrame())
                 .accessibilityHidden(true)
         }.buttonStyle(DeskIconButton())
             .onHover { inside in
-                if inside, !hovering, enabled, !reduceMotion { pulse &+= 1 }
+                guard inside != hovering else { return }
                 hovering = inside
+                if inside, motionAllowed {
+                    // Move forward once and hold. No return leg while hovered.
+                    withAnimation(.easeOut(duration: 0.65)) {
+                        motion = DeskIconMotionFrame(rotation: 90, slide: 1)
+                    }
+                } else { resetMotion() }
+            }
+            .onChange(of: motionAllowed) { _, allowed in
+                if !allowed { resetMotion() }
             }
             .help(title).accessibilityLabel(title)
+    }
+
+    private func resetMotion() {
+        // Leaving during an animation cancels it immediately. Resetting without
+        // interpolation also prevents a backwards spin on exit or rapid reentry.
+        var transaction = Transaction(animation: nil)
+        transaction.disablesAnimations = true
+        withTransaction(transaction) { motion = DeskIconMotionFrame() }
     }
 }
 
