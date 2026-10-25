@@ -93,5 +93,9 @@ Normal tests use only `Fixtures/fake-claude.py`. A live check requires explicitl
 image with an expanding circular hole. The new appearance is applied immediately underneath; the
 click-through overlay lasts 480 ms and is removed on completion, rapid replacement, navigation,
 dismissal or Reduce Motion changes. Failed capture and missing anchors apply appearance instantly.
+`DeskAppearanceBridge` applies the saved choice when the owning popover attaches and when it changes.
+The theme button also updates that window immediately. An explicit SwiftUI color-scheme environment
+keeps semantic colors in sync; System removes window/application overrides and uses inherited appearance.
+This avoids inheriting a fixed dark appearance from the menu-bar anchor.
 System remains the default. No screen recording, file export or account operation is involved.
 The website uses the View Transition API for the equivalent reveal, with immediate fallbacks.

@@ -6,8 +6,12 @@ enum DeskAppearance: String, CaseIterable {
     var next: Self { self == .system ? .light : self == .light ? .dark : .system }
     var title: String { rawValue.capitalized }
     var scheme: ColorScheme? { self == .system ? nil : self == .dark ? .dark : .light }
-    @MainActor func applyToApp() {
-        NSApp.appearance = self == .system ? nil : NSAppearance(named: self == .dark ? .darkAqua : .aqua)
+    var appKitAppearance: NSAppearance? {
+        self == .system ? nil : NSAppearance(named: self == .dark ? .darkAqua : .aqua)
+    }
+    @MainActor func applyToApp(window: NSWindow? = nil) {
+        NSApp.appearance = appKitAppearance
+        window?.appearance = appKitAppearance
     }
 }
 
@@ -40,12 +44,40 @@ enum DeskTheme {
 
 private struct DeskAppearanceModifier: ViewModifier {
     @AppStorage("usageDeskAppearance") private var appearance = DeskAppearance.system.rawValue
+    @Environment(\.colorScheme) private var inheritedScheme
     private var choice: DeskAppearance { DeskAppearance(rawValue: appearance) ?? .system }
     func body(content: Content) -> some View {
-        content.preferredColorScheme(choice.scheme)
+        content.environment(\.colorScheme, choice.scheme ?? inheritedScheme)
+            .background(DeskAppearanceBridge(choice: choice).allowsHitTesting(false).accessibilityHidden(true))
             .onChange(of: appearance, initial: true) { _, _ in
                 choice.applyToApp()
             }
+    }
+}
+
+/// Apply appearance to the owning popover, including when it first attaches.
+private struct DeskAppearanceBridge: NSViewRepresentable {
+    let choice: DeskAppearance
+    func makeNSView(context: Context) -> DeskAppearanceView {
+        let view = DeskAppearanceView()
+        view.choice = choice
+        return view
+    }
+    func updateNSView(_ view: DeskAppearanceView, context: Context) {
+        view.choice = choice
+        view.synchronize()
+    }
+}
+
+private final class DeskAppearanceView: NSView {
+    var choice: DeskAppearance = .system
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        synchronize()
+    }
+    func synchronize() {
+        guard let window, window.appearance?.name != choice.appKitAppearance?.name else { return }
+        window.appearance = choice.appKitAppearance
     }
 }
 
@@ -108,7 +140,7 @@ struct AppearanceButton: View {
             let next = choice.next
             ThemeRevealTransition.shared.perform(from: revealOrigin.view) {
                 appearance = next.rawValue
-                next.applyToApp()
+                next.applyToApp(window: revealOrigin.view?.window)
             }
         } label: {
             ZStack {

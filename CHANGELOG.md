@@ -2,6 +2,8 @@
 
 ## Unreleased — 0.1.1
 
+- Fixed Light/Dark selection changing only the icon when the popover inherits a dark menu-bar appearance. Build 3 applies the choice to the owning window and SwiftUI colors.
+
 - Fixed the native circular theme reveal disappearing during SwiftUI appearance updates; the overlay now uses a stable AppKit surface.
 
 - Replaced website screenshots with an interactive native-style preview using isolated sample accounts, account settings and Preferences.

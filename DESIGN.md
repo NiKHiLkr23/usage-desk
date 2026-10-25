@@ -46,3 +46,7 @@ container above the SwiftUI hosting view, so appearance updates cannot remove it
 mask an in-memory picture of this app’s own content until the reveal completes. The overlay never
 intercepts input and is discarded on replacement, navigation, dismissal or Reduce Motion. Never
 persist or transmit the picture. Effective-theme changes only; System remains the default.
+
+Apply explicit Light/Dark appearance to the owning popover window as well as the app.
+Pass the chosen color scheme into SwiftUI so semantic colors repaint even when the menu-bar
+anchor has its own appearance. System clears both overrides and follows inherited appearance.
