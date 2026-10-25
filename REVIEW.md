@@ -4,22 +4,31 @@
 live CLI compatibility, a fresh-Mac installation, and Vercel Analytics activation still need
 release-time verification. Local checks do not establish those production behaviors.
 
-Reviewed 2026-10-25: `codex/v0.1.1-refactor` through source checkpoint `2380b3a` and its distribution metadata, compared with merge-base
+Reviewed 2026-10-25: `codex/v0.1.1-refactor` through source checkpoint `de0242b` and its distribution metadata, compared with merge-base
 `838fd7219fe9db38f56427e3d426f872f245934a` of the locally known `origin/main`. No fetch was
 performed. Scope includes the 90 changed files, their native/account callers, source-release
 and CI configuration, and the 162 publishable files. The implementation was committed before
 the final review; only distribution metadata and this report are updated afterward. The portfolio repository is outside scope.
 
-The app source checkpoint is `2380b3a231de5c141b7d791de575f1159bb26790`, version 0.1.1,
-build 2. `website/install.sh` and `website/release.json` agree on that checkpoint. Distribution
+The app source checkpoint is `de0242b82f63cda645a068f1a0f969d48e1b7e2e`, version 0.1.1,
+build 3. `website/install.sh` and `website/release.json` agree on that checkpoint. Distribution
 remains source-only: local compilation and ad-hoc signing, with no public app binary,
 Developer ID identity, notarization, or Gatekeeper changes. The production domain is
 https://usage-desk.nikhilkr.in/; deployment of this branch has not been performed.
 
 ## Issues
 
-None found in the reviewed source. No confirmed credential leak, authentication replacement,
-model-prompt execution, or destructive account operation was identified in the changed paths.
+**P2 — Existing optional demo-bundle startup failure (nonblocking for the normal source installer).**
+`Sources/ResetDesk/AccountStore.swift:67` force-unwraps a preferences suite named
+`in.nikhilkr.resetdesk.demo`; `scripts/build.sh:32` assigns that same ID to the optional demo bundle.
+On the current macOS host, launching that bundle reports that its own bundle ID cannot be used
+as a suite name and terminates. Use standard defaults inside the distinct demo bundle, keeping
+the named isolated suite for demo execution from other bundle IDs. This was observed while
+preparing synthetic UI verification; it is separate from the normal app theme fix and remains open.
+The normal app uses standard defaults and the website installer never selects `--demo`.
+
+No confirmed credential leak, authentication replacement, model-prompt execution, or destructive
+account operation was identified in the changed paths.
 Pattern scans are evidence for the scanned files and patterns, not proof against every possible leak.
 
 Privacy and security boundaries checked:
@@ -52,7 +61,8 @@ Privacy and security boundaries checked:
 
 ## Improvements
 
-None required for this scoped source change. Further provider capabilities, automatic updates,
+No additional changes are required for the scoped normal-app theme fix. The optional demo-bundle
+startup issue above should be resolved before using that bundle for public captures. Further provider capabilities, automatic updates,
 app telemetry and signed binary distribution remain separate product decisions.
 
 ## Simplification opportunities
@@ -67,13 +77,13 @@ Completed during implementation, before the final read-only review:
 
 | Check | Evidence |
 | --- | --- |
-| `swift test --scratch-path .build --cache-path .cache` | 44 passed, 3 explicit live-account tests skipped; zero failures. |
+| `swift test --scratch-path .build --cache-path .cache` | 45 passed, 3 explicit live-account tests skipped; zero failures. |
 | `zsh scripts/build.sh --universal` | Apple Silicon and Intel release build succeeded. |
 | `lipo -archs` and `codesign --verify --strict` on the built app | arm64 + x86_64; local ad-hoc signature verified. |
-| `node scripts/check-website.mjs` | 361 structural, SEO, local-link, metadata and publishable-file checks passed across 162 public files. Includes JS syntax, analytics privacy checks and 23 isolated installer scenarios with no network or real installation. |
+| `node scripts/check-website.mjs` | 360 structural, SEO, local-link, metadata and publishable-file checks passed across 162 public files. Includes JS syntax, analytics privacy checks and 23 isolated installer scenarios with no network or real installation. |
 | `node scripts/check-release.mjs` | Passed synthetic source-pin/version/checksum, text-only output, dirty-tree/tag rejection and website-promotion scenarios. |
 | `node scripts/version.mjs --check` | Version and structured-data/CSP metadata consistent. |
-| Native theme regression and integration probe | Reproduced the original defect in the actual SwiftUI panel: the NSImageView stayed attached but SwiftUI removed its backing layer/mask. An AppKit-owned container now keeps the overlay in the displayed layer tree. The new regression verifies mask retention through appearance updates, one overlay during reversal and cleanup. The earlier 41-sample/31-radius probe alone did not establish visibility. Synthetic accounts only. |
+| Native theme regressions and UI verification | The earlier AppKit container fix preserves the overlay layer, but did not establish that selected colors repaint. A new rendered-pixel regression pins the popover anchor to dark appearance: old source fails both Light assertions; build 3 passes Light → Dark → Light and System override release. The existing test still checks overlay mask retention, reversal and cleanup. Clicking the real theme control in an isolated native panel with actual product views visibly changed both colors and the circular reveal; Preferences retained the chosen appearance. Synthetic accounts only, using a distinct diagnostic bundle to avoid the optional demo-bundle issue above. The maintainer’s recorded normal app was the correct executable, running the earlier build; it was not an installation mix-up. |
 | Local browser interaction checks | Usage/Resets/Accounts, earned/scheduled resets, Codex/Claude selection, account settings, escaped name edits, Saved feedback, draft retention across Preferences, keyboard tab/menu controls and synchronized theme controls worked. Circular website reveal was observed. |
 | Responsive/browser checks | Desktop and 375px viewport checked; narrow-layout overflow was corrected. No console warnings or errors observed on the final preview. Temporary viewport override was reset. |
 | Publication hygiene | Publishable-file/history pattern scans found no matches; `git diff --check` passed. No production service, real account or personal screenshot was used for verification. |
@@ -87,7 +97,7 @@ Remaining checks and decisions:
 
 1. Finish the maintainer's native app test on the new build: appearance reveal in both directions,
    hover effects, rapid clicks, dismissal/reopen and Reduce Motion. The installed/running app was not automatically relaunched; reopen the newly built app
-   to load the corrected reveal.
+   to load build 3 and the corrected appearance. The normal account-bearing app was not relaunched or visually exercised; native UI evidence used isolated sample accounts.
 2. Confirm current Codex and Claude CLI sign-in/usage behavior explicitly before release. Offline
    fixtures cannot establish compatibility with a particular installed CLI or live provider. No live
    account test was opted into here, and no active Codex/T3 login was changed.
