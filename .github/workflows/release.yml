@@ -1,0 +1,46 @@
+name: Prepare source release
+on:
+  push:
+    tags: ['v[0-9]*']
+permissions:
+  contents: read
+concurrency:
+  group: source-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+  draft:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate version and prepare source-only assets
+        run: |
+          set -eu
+          node scripts/version.mjs --check
+          node scripts/prepare-release.mjs
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -eu
+          version="$(cat VERSION)"
+          tag="v$version"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo 'A release already exists; inspect it instead of overwriting it.' >&2
+            exit 1
+          fi
+          gh release create "$tag" \
+            "dist/releases/$tag/install.sh" \
+            "dist/releases/$tag/release.json" \
+            "dist/releases/$tag/RELEASE_NOTES.md" \
+            "dist/releases/$tag/SHA256SUMS" \
+            --verify-tag --draft --title "Usage Desk $version" \
+            --notes-file "docs/releases/$tag.md"
