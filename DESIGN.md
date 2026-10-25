@@ -41,7 +41,8 @@ provider icons templated. Retain the original pixel representation for crisp Ret
 
 ## Appearance motion
 
-A circular reveal grows from the theme control over 480 ms. Apply the new appearance immediately;
+A circular reveal grows from the theme control over 480 ms. The overlay belongs to an AppKit
+container above the SwiftUI hosting view, so appearance updates cannot remove its backing layer. Apply the new appearance immediately;
 mask an in-memory picture of this app’s own content until the reveal completes. The overlay never
 intercepts input and is discarded on replacement, navigation, dismissal or Reduce Motion. Never
 persist or transmit the picture. Effective-theme changes only; System remains the default.

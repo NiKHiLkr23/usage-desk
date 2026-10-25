@@ -2,6 +2,8 @@
 
 ## Unreleased — 0.1.1
 
+- Fixed the native circular theme reveal disappearing during SwiftUI appearance updates; the overlay now uses a stable AppKit surface.
+
 - Replaced website screenshots with an interactive native-style preview using isolated sample accounts, account settings and Preferences.
 - Shared System-first website/preview appearance with a circular theme reveal; added the matching in-memory native effect with Reduce Motion and interruption support.
 

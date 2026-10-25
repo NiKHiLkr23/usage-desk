@@ -156,7 +156,6 @@ struct DeskRootView: View {
             panel.behavior = .transient
             panel.delegate = lifecycle
             let host = DeskHostingController(rootView: DeskRootView(store: store, navigation: navigation))
-            host.sizingOptions = []
             panel.contentViewController = host
             popover = panel
             routeObservation = navigation.$page.dropFirst().receive(on: RunLoop.main).sink { _ in resize() }
@@ -207,8 +206,35 @@ struct DeskRootView: View {
     }
 }
 
-@MainActor private final class DeskHostingController: NSHostingController<DeskRootView> {
+/// AppKit owns the presentation surface; SwiftUI owns only its child. Adding an
+/// animation overlay directly to NSHostingView lets SwiftUI discard its backing
+/// layer during appearance updates, even while the NSView remains attached.
+@MainActor final class DeskHostingController: NSViewController {
+    private let hosting: NSHostingController<DeskRootView>
+    private var rootView: DeskRootView { hosting.rootView }
     private var keyMonitor: Any?
+
+    init(rootView: DeskRootView) {
+        hosting = NSHostingController(rootView: rootView)
+        hosting.sizingOptions = []
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func loadView() {
+        let surface = NSView()
+        surface.wantsLayer = true
+        view = surface
+        addChild(hosting)
+        hosting.view.translatesAutoresizingMaskIntoConstraints = false
+        surface.addSubview(hosting.view)
+        NSLayoutConstraint.activate([
+            hosting.view.leadingAnchor.constraint(equalTo: surface.leadingAnchor),
+            hosting.view.trailingAnchor.constraint(equalTo: surface.trailingAnchor),
+            hosting.view.topAnchor.constraint(equalTo: surface.topAnchor),
+            hosting.view.bottomAnchor.constraint(equalTo: surface.bottomAnchor),
+        ])
+    }
     override func viewDidAppear() {
         super.viewDidAppear()
         guard keyMonitor == nil else { return }

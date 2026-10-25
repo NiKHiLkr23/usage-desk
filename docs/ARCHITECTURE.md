@@ -7,7 +7,8 @@ URL validation, login correlation, and JSON-RPC client. There are no third-party
 Swift 6 compiles the package in Swift 5 language mode; minimum macOS is 14.
 
 `AppDelegate` owns an `NSStatusItem`. `AppWindows` retains one transient `NSPopover` and
-`DeskNavigation`; SwiftUI fills its hosting view. Usage, Resets, and quick Accounts share the
+`DeskNavigation`. An AppKit-owned container retains the SwiftUI hosting controller as a child,
+so appearance updates cannot discard the theme overlay’s backing layer. Usage, Resets, and quick Accounts share the
 compact view. Manage/Add account expand the same panel. Preferences replaces its contents.
 `PanelResizeAnimator` interpolates the content size over 280 ms; it cancels/reverses on a new
 route and stops on dismissal. Reduce Motion skips resizing animation.
