@@ -7,6 +7,8 @@
 - Claude profile-directory and executable selection, including installations managed by nvm.
 - Preserve macOS user context for Claude Keychain sign-in and permit usage reads while
   disabling telemetry, error reporting, feedback, and automatic updates.
+- Keep provider icons at native menu size instead of displaying full-size logos in the account picker.
+- Copy sign-in commands and links show clipboard success, retry feedback, and VoiceOver announcements without shifting the layout.
 - Shared version source and version/build information in Preferences.
 - Refreshed Codex/Claude website copy, native screenshots, and social cards.
 - CI-gated source-release drafts, text-asset checksums, and an installer pinned to a reviewed 0.1.1 source checkpoint.

@@ -5,6 +5,7 @@ struct DashboardView: View {
     @ObservedObject var store: AccountStore
     @ObservedObject var navigation: DeskNavigation
     @State private var confirmingQuit = false
+    @Environment(\.colorScheme) private var colorScheme
     private var tab: String { navigation.usageTab }
     private var resetTab: String {
         get { navigation.resetTab }
@@ -106,7 +107,15 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Menu {
                     ForEach(store.accounts) { account in
-                        Button { store.selectedID = account.id } label: { HStack { ProviderIcon(provider: account.provider, size: 14); Text(account.label) } }
+                        Button { store.selectedID = account.id } label: {
+                            Label {
+                                Text(account.label)
+                            } icon: {
+                                if let image = ProviderIcon.menuImage(for: account.provider, colorScheme: colorScheme) {
+                                    Image(nsImage: image).renderingMode(.original)
+                                } else { Image(systemName: "person.crop.circle") }
+                            }
+                        }.accessibilityLabel("\(account.provider.title), \(account.label)")
                     }
                 } label: {
                     HStack(spacing: 5) {

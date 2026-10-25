@@ -1,4 +1,6 @@
 import XCTest
+import AppKit
+import SwiftUI
 import ResetDeskCore
 @testable import ResetDesk
 
@@ -7,7 +9,30 @@ final class DemoTests: XCTestCase {
         for provider in ResetDeskCore.AccountProvider.allCases {
             let image = ProviderIcon.image(for: provider)
             XCTAssertNotNil(image)
-            XCTAssertGreaterThan(image?.size.width ?? 0, 0)
+            XCTAssertEqual(image?.size.width, 18)
+            let menuImage = ProviderIcon.image(for: provider, size: 14)
+            XCTAssertEqual(menuImage?.size.width, 14)
+            XCTAssertEqual(menuImage?.size.height, 14)
+            XCTAssertEqual(menuImage?.isTemplate, true)
+        }
+    }
+    @MainActor func testNativeMenuIconsKeepSizeAndContrastInBothAppearances() throws {
+        for provider in AccountProvider.allCases {
+            for scheme in [ColorScheme.light, .dark] {
+                let image = try XCTUnwrap(ProviderIcon.menuImage(for: provider, colorScheme: scheme))
+                XCTAssertEqual(image.size, NSSize(width: 14, height: 14))
+                let pixels = try XCTUnwrap(image.tiffRepresentation.flatMap(NSBitmapImageRep.init(data:)))
+                var opaque: NSColor?
+                for y in 0..<pixels.pixelsHigh {
+                    for x in 0..<pixels.pixelsWide {
+                        if let color = pixels.colorAt(x: x, y: y)?.usingColorSpace(.deviceRGB), color.alphaComponent > 0.9 { opaque = color; break }
+                    }
+                    if opaque != nil { break }
+                }
+                let color = try XCTUnwrap(opaque, "Provider menu icon must have visible pixels")
+                if scheme == .dark { XCTAssertGreaterThan(color.redComponent, 0.9) }
+                else { XCTAssertLessThan(color.redComponent, 0.1) }
+            }
         }
     }
     @MainActor func testDemoUsesOnlySyntheticAccountsAndCannotAuthenticate() async throws {

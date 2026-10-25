@@ -45,8 +45,7 @@ struct ClaudeAccountConnectionView: View {
                         Task { await store.refresh(id) }
                     } catch { self.error = error.localizedDescription }
                 }.buttonStyle(AccentButton()).disabled(draft.label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                Button("Copy sign-in command") { copySignInCommand() }
-                    .help("Run this in Terminal if you have not signed in to this Claude CLI profile yet.")
+                copyCommandButton
                 Text("Not signed in yet? Run the copied command in Terminal, finish Claude’s browser sign-in, then connect here.")
                     .font(.system(size: 10)).foregroundStyle(DeskTheme.muted)
             } else if state.isLoading {
@@ -63,15 +62,13 @@ struct ClaudeAccountConnectionView: View {
                 }
             } else {
                 Text("Sign in through Claude CLI, then refresh here.").font(.system(size: 12, weight: .medium))
-                Button("Copy sign-in command") {
-                    copySignInCommand()
-                }
+                copyCommandButton
                 Text("Paste the command in Terminal. Claude opens its own browser sign-in; Usage Desk never asks for your password.")
                     .font(.system(size: 10)).foregroundStyle(DeskTheme.muted)
                 Button("Refresh connection") { if let account { Task { await store.refresh(account.id) } } }.buttonStyle(AccentButton())
             }
             if let error = error ?? state.error {
-                if state.info != nil { Button("Copy sign-in command") { copySignInCommand() } }
+                if state.info != nil { copyCommandButton }
                 Text(error).font(.system(size: 11)).foregroundStyle(DeskTheme.amber).textSelection(.enabled)
             }
             Text("Usage Desk reads limits through Claude CLI without sending prompts. Your T3 account and Claude settings stay in place.")
@@ -79,9 +76,11 @@ struct ClaudeAccountConnectionView: View {
             if let account { Button("Remove from Usage desk", role: .destructive) { remove(account) }.font(.system(size: 11)) }
         }.frame(maxWidth: .infinity, alignment: .leading)
     }
-    private func copySignInCommand() {
+    private var copyCommandButton: some View {
+        CopyFeedbackButton(title: "Copy sign-in command") { signInCommand }
+    }
+    private var signInCommand: String {
         let quote: (String) -> String = { "'" + $0.replacingOccurrences(of: "'", with: "'\"'\"'") + "'" }
-        let command = "CLAUDE_CONFIG_DIR=\(quote(account?.home ?? draft.claudeHome)) \(quote(store.claudeExecutablePath)) auth login"
-        NSPasteboard.general.clearContents(); NSPasteboard.general.setString(command, forType: .string)
+        return "CLAUDE_CONFIG_DIR=\(quote(account?.home ?? draft.claudeHome)) \(quote(store.claudeExecutablePath)) auth login"
     }
 }

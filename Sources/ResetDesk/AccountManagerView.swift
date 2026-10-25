@@ -132,10 +132,8 @@ struct AddAccountView: View {
                     Text(pending.url == nil ? "Requesting a secure sign-in link from Codex. You can cancel and retry if needed." : "Choose the intended account on OpenAI’s page. Your Chrome profile and OpenAI account can use different emails.").font(.system(size: 11)).foregroundStyle(DeskTheme.muted)
                     HStack {
                         Button("Open sign-in again") { store.openPendingSignIn() }.buttonStyle(AccentButton()).disabled(pending.url == nil)
-                        Button("Copy sign-in link") {
-                            guard let url = pending.url else { return }
-                            NSPasteboard.general.clearContents(); NSPasteboard.general.setString(url.absoluteString, forType: .string)
-                        }.disabled(pending.url == nil)
+                        CopyFeedbackButton(title: "Copy sign-in link") { pending.url?.absoluteString }
+                            .disabled(pending.url == nil)
                     }
                     Button("Cancel sign-in") { Task { await store.cancelSignIn() } }.buttonStyle(DeskButton()).font(.system(size: 11))
                 }.deskCard()
