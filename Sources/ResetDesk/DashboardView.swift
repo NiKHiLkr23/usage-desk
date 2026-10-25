@@ -237,6 +237,7 @@ struct DashboardView: View {
             Text(state.error != nil ? "Needs attention" : state.isLoading ? "Updating…" : state.usage != nil ? "Live" : "Not connected")
             if let date = state.updated { Text("·"); Text(date, style: .relative).help("Time since last successful read") }
             Spacer()
+            CoffeeButton(controller: store.keepAwake)
             Button { confirmingQuit = true } label: { Image(systemName: "power") }
                 .buttonStyle(DeskIconButton()).help("Quit Usage desk").accessibilityLabel("Quit Usage desk")
         }.font(.system(size: 10)).foregroundStyle(DeskTheme.muted).padding(.horizontal, 20).padding(.vertical, 12)

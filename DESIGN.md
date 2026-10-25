@@ -53,3 +53,18 @@ Apply explicit Light/Dark appearance to the owning popover window as well as the
 Pass the chosen color scheme into SwiftUI so semantic colors repaint even when the menu-bar
 anchor has its own appearance. System clears the application override and resolves the popover appearance from the app,
 rather than its menu-bar anchor. Observe app appearance changes so System keeps following macOS.
+
+## Keep awake
+
+The dashboard footer places a 32-point coffee button immediately before Quit.
+An app-owned IOKit PreventUserIdleSystemSleep assertion lasts only until toggled
+off or app exit; it never persists across launch. Display sleep, lid-close and
+forced sleep remain governed by macOS. Filled coffee plus a small solid dot mark
+the active state even without hover, independently of color.
+
+Coffee hover plays forward once over 750–850 ms, holds, and resets immediately on
+exit. Reduce Motion removes the decorative gesture while preserving toggle state.
+The original code-drawn Brew, Steam and Pour alternatives share the same behavior;
+Brew is the provisional dashboard default. Compare alternatives only with
+scripts/review-coffee.sh; the normal app has no animation selector. Review recordings
+are native SwiftUI animation studies with a synthetic footer and never account captures.
