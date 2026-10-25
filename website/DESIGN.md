@@ -2,17 +2,17 @@
 
 ## Intent and hierarchy
 
-A small native macOS utility for people tracking Codex quotas across accounts. Lead with
-what it does, the source-install command, and the real app. GitHub stars are a secondary
+A small native macOS utility for people tracking Codex and Claude quotas across accounts. Lead with
+what it does, the source-install command, and an interactive app preview. GitHub stars are a secondary
 community action. Keep requirements beside the command: local compilation, macOS 14+,
-Swift 6+, Xcode Command Line Tools, and an installed/signed-in Codex CLI for app use.
+Swift 6+, Xcode Command Line Tools, and an installed/signed-in Codex or Claude CLI for app use.
 
 ## Existing design system
 
 `style.css` contains the executable color, typography, spacing, and motion rules.
 Use black and white with a system-first appearance toggle. Green is limited to the logo,
-quota/status indicators inside native captures, focus outlines, and successful copy feedback.
-Retain Helvetica Neue/system fallbacks and ample spacing. Buttons and preview tabs are
+quota/status indicators inside the preview, focus outlines, and successful copy feedback.
+Claude uses its provider orange (#D97757). Retain Helvetica Neue/system fallbacks and ample spacing. Buttons and preview tabs are
 fully rounded; command fields and the app frame use softer rectangular corners.
 
 ## Components and states
@@ -23,12 +23,15 @@ fully rounded; command fields and the app frame use softer rectangular corners.
 - GitHub star: ordinary repository link with an outlined star. No automatic starring, fake
   counts, or automatic GitHub API requests. Production-only, cookie-free Vercel analytics is a
   separate approved measurement layer; no app/account telemetry.
-- Product tabs: Usage, Accounts, Resets. Use actual `DeskRootView`/`DashboardView` renders
-  with `AccountStore(demo: true)`; omit the presentation-only Demo badge from captures
-  and disclose sample account data in the caption. Keep all demo safety guards active.
-  No HTML product reconstructions or generated app imagery. Use identical image dimensions
-  to prevent layout shifts. Usage remains visible without JavaScript; controls are enhanced only
-  when their backing behavior exists.
+- Interactive product preview: native-style Usage, Resets, Accounts, account details and Preferences.
+  HTML/CSS uses the native app's layout, colors and type scale, with three fixed example.com accounts.
+  A single selected-tab pill slides between buttons; content switches immediately.
+  Provider switching changes quotas/reset availability. Gears open the chosen account without changing
+  the viewed account. Editing display names is memory-only and gives Saved feedback.
+  The menu-bar entry toggles the panel. No Add account, sign-in, reconnect, removal, Quit, CLI path,
+  launch-at-login, or real provider calls are exposed. Preferences intentionally shows only previewable controls.
+  Caption: “Interactive preview · Sample data.” This is a reconstruction, not a native screenshot.
+  Keep Usage readable without JavaScript. Fixed panel height prevents layout shifts on page navigation.
 - Keep the full install instructions near the bottom, with the same copy behavior.
 - Footer: a spacious brand/headline block on the left, two link columns on the right,
   and a divider above the copyright and right-aligned maker/license credit. A faint decorative
@@ -39,16 +42,19 @@ fully rounded; command fields and the app frame use softer rectangular corners.
 
 Use semantic buttons, tablist/tab/tabpanel roles, roving tab focus, ArrowLeft/ArrowRight,
 Home/End, visible focus, and announced clipboard feedback. The command can scroll within
-its field on narrow screens without overflowing the page. Existing reduced-motion rules
-remove transitions. Tabs switch immediately; no autoplay or decorative entrance sequences.
-The native screenshots remain in light appearance across website themes, with a visible frame.
+its field on narrow screens without overflowing the page. Reduce Motion removes transitions. The gear rotates forward once through 90 degrees on hover;
+Preferences knobs slide once and hold. Both reset instantly on exit. Tabs animate over 280 ms.
+Theme controls share one System → Light → Dark preference. A 480 ms circular reveal grows from
+whichever theme button was pressed across the whole viewport, using the View Transition API.
+Unsupported browsers, unchanged effective themes, or Reduce Motion switch instantly. Rapid changes
+cancel old effects. No autoplay, simulated quota changes, or decorative entrance sequences.
 
 ## Verification
 
 `node scripts/check-website.mjs` checks structure, SEO, public files, and isolated installer
 scenarios. Inspect the local preview at desktop and narrow widths, with light/dark themes,
 keyboard tabs, repeated copying, and clipboard fallback. Never run the pasted installer as
-part of a website copy-button test. Native app logic is outside this website polish.
+part of a website copy-button test. The native appearance reveal is a separate AppKit layer; no account logic is shared with the preview.
 
 ## Decisions
 
@@ -64,3 +70,7 @@ real build phases, and a restrained terminal spinner. Keep build noise in a priv
 visible failure recovery. Offer app launch after installation; never require clickable links
 or an extra GUI dependency. Website images explicitly disable dragging, including logos
 and native product captures; normal links and brand downloads remain available.
+
+2026-10-25: The maintainer explicitly replaced website screenshots with an interactive native-style
+preview. Product PNGs were removed from the website; real repository screenshots remain available.
+Provider marks reuse the app's attributed Simple Icons assets. New action glyphs are original vectors.

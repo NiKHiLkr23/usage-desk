@@ -22,8 +22,8 @@ for(const filename of ['index.html','privacy.html','brand.html','404.html']){
 }
 const html=await read('index.html');
 for(const [,panel]of html.matchAll(/aria-controls="([^"]+)"/g)){assert.ok(html.includes(`id="${panel}"`));checks++}
-assert.ok(html.includes('Actual macOS app · Sample account data.'));assert.ok(html.includes('assets/showcase-usage.png'));assert.ok(html.includes('prefers-reduced-motion')||(await read('style.css')).includes('prefers-reduced-motion'));checks+=2;
-execFileSync(process.execPath,['--check',path.join(site,'app.js')]);checks++;
+assert.ok(html.includes('Interactive preview · Sample data.'));assert.ok(html.includes('data-app-preview'));assert.ok(!html.includes('assets/showcase-'));assert.ok(html.includes('prefers-reduced-motion')||(await read('style.css')).includes('prefers-reduced-motion'));checks+=4;
+for (const name of ['app.js','theme.js','app-preview.js']) { execFileSync(process.execPath,['--check',path.join(site,name)]);checks++; }
 execFileSync(process.execPath,['--check',path.join(site,'analytics.js')]);
 execFileSync(process.execPath,[path.join(root,'scripts/version.mjs'),'--check'],{stdio:'inherit'});
 execFileSync(process.execPath,[path.join(root,'scripts/check-analytics.mjs')],{stdio:'inherit'});

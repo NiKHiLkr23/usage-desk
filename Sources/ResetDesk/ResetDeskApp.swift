@@ -93,6 +93,7 @@ struct DeskRootView: View {
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(DeskTheme.background).foregroundStyle(DeskTheme.text).tint(DeskTheme.text).deskAppearance()
+            .onChange(of: navigation.page) { _, _ in ThemeRevealTransition.shared.cancel() }
             .onChange(of: store.connectionCompleted) { _, connection in
                 guard connection != nil else { return }
                 navigation.showUsage()
@@ -200,7 +201,10 @@ struct DeskRootView: View {
 }
 
 @MainActor private final class DeskPopoverLifecycle: NSObject, NSPopoverDelegate {
-    func popoverWillClose(_ notification: Notification) { AppWindows.stopResize() }
+    func popoverWillClose(_ notification: Notification) {
+        AppWindows.stopResize()
+        ThemeRevealTransition.shared.cancel()
+    }
 }
 
 @MainActor private final class DeskHostingController: NSHostingController<DeskRootView> {

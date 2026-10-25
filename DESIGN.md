@@ -5,7 +5,7 @@ account hit targets, and interruptible size transitions with Reduce Motion suppo
 
 ## Providers
 
-Add account begins with Codex / Claude choices, each with a monochrome provider icon.
+Add account begins with Codex / Claude choices, each with a provider icon; Claude uses #D97757 orange.
 Keep one account list and the existing Usage / Resets / Accounts tabs. Provider identity
 travels with each stored profile; pre-provider saved profiles decode as Codex.
 Use provider marks in the selected account header, quick account list, account menu, and
@@ -23,7 +23,8 @@ preserves clearly labelled last-known usage. Claude resets show the reported sch
 get_usage has no earned reset-credit feed, so hide the earned-credit controls for Claude.
 
 Provider icons: Simple Icons v14.15.0 (CC0), notices in the bundled Resources/NOTICE.txt.
-Keep the website's existing screenshot assets until new product imagery is reviewed.
+The website now uses an explicitly approved interactive native-style preview with sample accounts.
+Keep authentic repository captures separate from the website preview.
 
 ## Action feedback
 
@@ -37,3 +38,10 @@ Native menu items use a `Label` with an NSImage explicitly sized to 14 points. S
 frame/resizable modifiers do not define an NSMenu image’s size, and its bridge can drop
 template tinting. Render menu icons with the current light/dark foreground; keep regular
 provider icons templated. Retain the original pixel representation for crisp Retina rendering.
+
+## Appearance motion
+
+A circular reveal grows from the theme control over 480 ms. Apply the new appearance immediately;
+mask an in-memory picture of this app’s own content until the reveal completes. The overlay never
+intercepts input and is discarded on replacement, navigation, dismissal or Reduce Motion. Never
+persist or transmit the picture. Effective-theme changes only; System remains the default.

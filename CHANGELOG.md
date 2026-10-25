@@ -2,6 +2,9 @@
 
 ## Unreleased — 0.1.1
 
+- Replaced website screenshots with an interactive native-style preview using isolated sample accounts, account settings and Preferences.
+- Shared System-first website/preview appearance with a circular theme reveal; added the matching in-memory native effect with Reduce Motion and interruption support.
+
 - A persistent selected-tab pill glides between items, including keyboard selection and Reduce Motion support.
 
 - Account-settings gears and Preferences sliders move forward once on hover, hold their position, and reset on exit, with Reduce Motion support.

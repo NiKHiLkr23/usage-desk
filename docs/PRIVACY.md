@@ -43,7 +43,7 @@ from GitHub are subject to GitHub's policies. The local preview does not contact
 
 ## Public examples
 
-Public product images are actual app captures with the email permanently replaced by
+Repository product images are actual app captures with the email permanently replaced by
 `personal@example.com`; their metadata is stripped. Other usage values come from the capture.
 The original unredacted image is not in the repository. The optional screenshot-mode app
 uses synthetic accounts and never reads real accounts. Sanitize all screenshots and diagnostics
@@ -61,3 +61,15 @@ scan. Only account identity, plan, reported quota percentages, and reset times a
 for display. Output remains in memory, subprocess stderr is discarded, temporary working
 directories are removed, and backend failures use generic messages. Removing a profile
 retains its CLI directory and sign-in.
+
+## Interactive website preview and appearance effects
+
+The website preview uses fixed example.com accounts. It has no authentication flow, provider
+connection or app bridge. Sample display-name edits and preview settings stay in memory and reset
+on reload. Neither labels nor preview interactions are sent to analytics. Only the optional website
+theme is saved in localStorage; no app credentials or real account details are available to the page.
+
+The native appearance reveal briefly snapshots only its own app content in memory. The snapshot
+is not written to disk, logged or uploaded. The overlay is released after 480 ms, on a new change,
+on navigation or panel dismissal. Reduce Motion bypasses the effect. Browser theme transitions use
+the browser's own ephemeral rendering snapshots; no screenshot capture/download is performed.

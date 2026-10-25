@@ -25,7 +25,8 @@ assert.match(original, /<key>CFBundleShortVersionString<\/key>\s*<string>[^<]+<\
 outputs.push([plist, original, original.replace(/(<key>CFBundleShortVersionString<\/key>\s*<string>)[^<]+/, `$1${version}`)]);
 const pagePath = path.join(root, 'website/index.html');
 const page = await readFile(pagePath, 'utf8');
-const nextPage = page.replace(/("softwareVersion": ")[^"]+/, (_, prefix) => prefix + version);
+const nextPage = page.replace(/("softwareVersion": ")[^"]+/, (_, prefix) => prefix + version)
+  .replace(/(data-preview-version>)[^<]+/, (_, prefix) => prefix + version);
 assert.match(nextPage, /"softwareVersion": "/);
 outputs.push([pagePath, page, nextPage]);
 const configPath = path.join(root, 'website/vercel.json');

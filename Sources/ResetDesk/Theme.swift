@@ -6,6 +6,9 @@ enum DeskAppearance: String, CaseIterable {
     var next: Self { self == .system ? .light : self == .light ? .dark : .system }
     var title: String { rawValue.capitalized }
     var scheme: ColorScheme? { self == .system ? nil : self == .dark ? .dark : .light }
+    @MainActor func applyToApp() {
+        NSApp.appearance = self == .system ? nil : NSAppearance(named: self == .dark ? .darkAqua : .aqua)
+    }
 }
 
 enum DeskTheme {
@@ -41,7 +44,7 @@ private struct DeskAppearanceModifier: ViewModifier {
     func body(content: Content) -> some View {
         content.preferredColorScheme(choice.scheme)
             .onChange(of: appearance, initial: true) { _, _ in
-                NSApp.appearance = choice == .system ? nil : NSAppearance(named: choice == .dark ? .darkAqua : .aqua)
+                choice.applyToApp()
             }
     }
 }
@@ -98,9 +101,16 @@ struct AppearanceButton: View {
     @AppStorage("usageDeskAppearance") private var appearance = DeskAppearance.system.rawValue
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var hovering = false
+    @StateObject private var revealOrigin = ThemeRevealOrigin()
     private var choice: DeskAppearance { DeskAppearance(rawValue: appearance) ?? .system }
     var body: some View {
-        Button { appearance = choice.next.rawValue } label: {
+        Button {
+            let next = choice.next
+            ThemeRevealTransition.shared.perform(from: revealOrigin.view) {
+                appearance = next.rawValue
+                next.applyToApp()
+            }
+        } label: {
             ZStack {
                 Image(systemName: "display").opacity(choice == .system ? 1 : 0).scaleEffect(choice == .system ? 1 : 0.65)
                 Image(systemName: "sun.max").rotationEffect(.degrees(hovering && !reduceMotion ? 360 : 0))
@@ -117,7 +127,8 @@ struct AppearanceButton: View {
                 }.animation(reduceMotion ? nil : .easeOut(duration: 0.3), value: hovering)
                     .opacity(choice == .dark ? 1 : 0).scaleEffect(choice == .dark ? 1 : 0.65)
             }.animation(reduceMotion ? nil : .easeOut(duration: 0.26), value: appearance)
-        }.buttonStyle(DeskIconButton()).onHover { hovering = $0 }
+        }.buttonStyle(DeskIconButton()).background(ThemeRevealAnchor(origin: revealOrigin))
+            .onHover { hovering = $0 }
             .accessibilityLabel("Theme: \(choice.title). Switch to \(choice.next.rawValue) mode.")
             .help("\(choice.title) theme · Click for \(choice.next.rawValue)")
     }

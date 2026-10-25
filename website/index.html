@@ -27,7 +27,10 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="assets/favicon.ico">
   <link rel="apple-touch-icon" href="assets/favicon-180.png">
+  <script src="theme.js"></script>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="preview.css">
+  <script src="app-preview.js" defer></script>
   <script src="app.js" defer></script><script src="analytics.js" defer></script>
   <script type="application/ld+json">
 {
@@ -67,7 +70,6 @@
       "isAccessibleForFree": true,
       "license": "https://github.com/NiKHiLkr23/usage-desk/blob/main/LICENSE",
       "image": "https://usage-desk.nikhilkr.in/assets/social-preview.png",
-      "screenshot": "https://usage-desk.nikhilkr.in/assets/usage-light.png",
       "installUrl": "https://github.com/NiKHiLkr23/usage-desk#build-and-run",
       "offers": {
         "@type": "Offer",
@@ -130,18 +132,57 @@
       </div>
       <p class="build-note">Requires Xcode Command Line Tools and a signed-in Codex or Claude CLI.</p>
     </div>
-    <figure class="product-shot">
-      <div class="showcase-tabs" role="tablist" aria-label="Explore Usage Desk" data-showcase-tabs hidden>
-        <button type="button" role="tab" id="preview-tab-usage" aria-selected="true" aria-controls="preview-usage" tabindex="0">Usage</button>
-        <button type="button" role="tab" id="preview-tab-accounts" aria-selected="false" aria-controls="preview-accounts" tabindex="-1">Accounts</button>
-        <button type="button" role="tab" id="preview-tab-resets" aria-selected="false" aria-controls="preview-resets" tabindex="-1">Resets</button>
+    <figure class="product-shot" aria-label="Interactive Usage Desk preview">
+      <div class="app-preview" data-app-preview>
+        <div class="preview-menu-bar"><button type="button" data-preview-entry aria-expanded="true" aria-controls="app-preview-panel" aria-label="Open or close Usage Desk"><svg class="preview-glyph" aria-hidden="true" viewBox="0 0 24 24"><use href="assets/ui-icons.svg#usage"></use></svg><span data-menu-title>35%</span></button></div>
+        <div class="preview-panel" id="app-preview-panel" data-preview-panel>
+          <header class="preview-header">
+            <button type="button" class="preview-icon-button" data-preview-back aria-label="Back" hidden><svg class="preview-glyph" aria-hidden="true"><use href="assets/ui-icons.svg#back"></use></svg></button>
+            <span class="preview-title" data-preview-title>usage desk</span>
+            <div class="preview-header-actions">
+              <button type="button" class="preview-icon-button" data-preview-refresh aria-label="Refresh sample usage" title="Refresh usage"><svg class="preview-glyph" aria-hidden="true"><use href="assets/ui-icons.svg#refresh"></use></svg></button>
+              <button type="button" class="preview-icon-button preview-preferences-button" data-preview-preferences aria-label="Preferences" title="Preferences"><svg class="preview-sliders" aria-hidden="true" viewBox="0 0 16 16"><path d="M1 3h14M1 8h14M1 13h14"/><rect class="slider-one" x="3" y="1.1" width="3" height="3.8" rx=".7"/><rect class="slider-two" x="9" y="6.1" width="3" height="3.8" rx=".7"/><rect class="slider-three" x="5" y="11.1" width="3" height="3.8" rx=".7"/></svg></button>
+              <button class="preview-icon-button theme-toggle" type="button" data-theme-control aria-label="Theme: System. Switch to light mode."><svg class="theme-symbol" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect class="system-icon" x="3" y="4" width="18" height="13" rx="2"/><path class="system-icon" d="M8 21h8m-4-4v4"/><circle class="sun-icon" cx="12" cy="12" r="4"/><path class="sun-icon" d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/><path class="moon-icon" d="M20.5 14a8.5 8.5 0 0 1-10.5-10.5A8.5 8.5 0 1 0 20.5 14Z"/></svg></button>
+            </div>
+          </header>
+          <div class="preview-main" data-preview-main>
+            <div class="preview-selected-account">
+              <span class="preview-provider-tile" data-selected-provider><span class="preview-provider codex" role="img" aria-label="Codex"></span></span>
+              <div class="preview-selected-identity" data-account-picker-wrap>
+                <button class="preview-account-picker" type="button" data-account-picker aria-haspopup="menu" aria-expanded="false" aria-controls="preview-account-menu"><svg class="preview-glyph" aria-hidden="true"><use href="assets/ui-icons.svg#down"></use></svg><strong data-selected-name>Personal</strong></button>
+                <span data-selected-email>personal@example.com</span>
+                <div class="preview-account-menu" id="preview-account-menu" data-account-menu role="menu" aria-label="Choose a sample account" hidden></div>
+              </div>
+              <span class="preview-plan" data-selected-plan>Plus</span>
+            </div>
+            <div class="preview-tabs" data-preview-tabs data-index="0" role="tablist" aria-label="Explore Usage Desk">
+              <span class="preview-tab-indicator" aria-hidden="true"></span>
+              <button type="button" id="preview-tab-usage" data-preview-tab="usage" role="tab" aria-selected="true" aria-controls="preview-usage" tabindex="0"><svg class="preview-glyph" aria-hidden="true"><use href="assets/ui-icons.svg#usage"></use></svg>Usage</button>
+              <button type="button" id="preview-tab-resets" data-preview-tab="resets" role="tab" aria-selected="false" aria-controls="preview-resets" tabindex="-1"><svg class="preview-glyph" aria-hidden="true"><use href="assets/ui-icons.svg#reset"></use></svg><span data-resets-label>Resets · 1</span></button>
+              <button type="button" id="preview-tab-accounts" data-preview-tab="accounts" role="tab" aria-selected="false" aria-controls="preview-accounts" tabindex="-1"><svg class="preview-glyph" aria-hidden="true"><use href="assets/ui-icons.svg#accounts"></use></svg>Accounts</button>
+            </div>
+            <div class="preview-body">
+              <section id="preview-usage" role="tabpanel" aria-labelledby="preview-tab-usage" tabindex="0">
+                <div class="preview-meters" data-preview-meters><div class="preview-meter"><div class="preview-meter-top"><span>5-hour window</span><span>Codex</span></div><div class="preview-percent"><span>35</span><span>% left</span></div><p class="preview-reset">Resets in 3h 37m</p></div><div class="preview-meter"><div class="preview-meter-top"><span>Weekly window</span><span>Codex</span></div><div class="preview-percent"><span>90</span><span>% left</span></div><p class="preview-reset">Resets in 6d 22h</p></div></div>
+                <button type="button" class="preview-earned" data-earned-shortcut><svg class="preview-glyph" aria-hidden="true"><use href="assets/ui-icons.svg#reset"></use></svg><span>Earned resets</span><span data-earned-count>1 available</span><svg class="preview-glyph" aria-hidden="true"><use href="assets/ui-icons.svg#right"></use></svg></button>
+              </section>
+              <section id="preview-resets" role="tabpanel" aria-labelledby="preview-tab-resets" tabindex="0" hidden>
+                <div class="preview-tabs preview-reset-tabs" data-reset-tabs data-index="0" role="tablist" aria-label="Reset types"><span class="preview-tab-indicator" aria-hidden="true"></span><button type="button" data-reset-tab="earned" id="preview-reset-earned" role="tab" aria-selected="true" aria-controls="preview-earned-panel">Earned</button><button type="button" data-reset-tab="schedule" id="preview-reset-schedule" role="tab" aria-selected="false" aria-controls="preview-schedule-panel" tabindex="-1">Schedule</button></div>
+                <div id="preview-earned-panel" role="tabpanel" aria-labelledby="preview-reset-earned" data-reset-earned-panel><div data-reset-content></div></div><div id="preview-schedule-panel" role="tabpanel" aria-labelledby="preview-reset-schedule" data-reset-schedule-panel hidden></div>
+              </section>
+              <section id="preview-accounts" role="tabpanel" aria-labelledby="preview-tab-accounts" tabindex="0" hidden><div class="preview-accounts-heading"><span>Your accounts</span><span>3 profiles</span><button type="button" class="preview-link-button" data-manage-selected>Manage accounts</button></div><div data-account-rows></div></section>
+            </div>
+          </div>
+          <section class="preview-settings" data-preview-details-page aria-label="Account settings" hidden>
+            <h2>Edit account</h2><form data-name-form><label for="preview-name">Display name</label><div class="preview-input-row"><input id="preview-name" data-preview-label maxlength="80" autocomplete="off" spellcheck="false"><button type="submit" class="preview-button" data-save-name disabled>Save</button></div><p class="preview-feedback" role="status" data-name-feedback></p></form><div class="preview-reset-card" data-detail-identity></div><button type="button" class="preview-button preview-primary" data-detail-usage>View usage</button>
+          </section>
+          <section class="preview-settings" data-preview-preferences-page aria-label="Preferences" hidden>
+            <p class="preview-note">Theme follows your Mac by default. Use the icon to override it.</p><label class="preview-check"><input type="checkbox" data-menu-quota checked>Show quota in menu bar</label><label class="preview-refresh-label">Refresh usage<select data-preview-interval><option value="60">Every minute</option><option value="120">Every 2 minutes</option><option value="300">Every 5 minutes</option></select></label><p class="preview-note preview-settings-note">Your accounts stay on your Mac.</p><div class="preview-version"><span>Usage Desk <span data-preview-version>0.1.1</span> (2)</span><a href="https://github.com/NiKHiLkr23/usage-desk/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Release notes ↗</a></div>
+          </section>
+          <footer class="preview-footer" data-preview-footer><span class="preview-live-dot" aria-hidden="true"></span><span data-preview-status>Live · 3 secs</span></footer>
+        </div>
       </div>
-      <div class="showcase-viewport">
-        <div role="tabpanel" id="preview-usage" aria-labelledby="preview-tab-usage"><img draggable="false" src="assets/showcase-usage.png" width="840" height="1000" alt="Actual Usage Desk app with sample data: five-hour and weekly Codex quotas, reset countdowns, and an earned reset." fetchpriority="high" decoding="async"></div>
-        <div role="tabpanel" id="preview-accounts" aria-labelledby="preview-tab-accounts" hidden><img draggable="false" src="assets/showcase-accounts.png" width="840" height="1000" alt="Actual Usage Desk Accounts tab with sample Codex and Claude profiles." decoding="async"></div>
-        <div role="tabpanel" id="preview-resets" aria-labelledby="preview-tab-resets" hidden><img draggable="false" src="assets/showcase-resets.png" width="840" height="1000" alt="Actual Usage Desk Resets tab showing a sample earned reset and its expiration date." decoding="async"></div>
-      </div>
-      <figcaption>Actual macOS app · Sample account data.</figcaption>
+      <figcaption>Interactive preview · Sample data.</figcaption><noscript><p class="preview-note">Enable JavaScript to try the controls.</p></noscript>
     </figure>
   </section>
 

@@ -110,11 +110,6 @@ p { color: var(--muted); }
 .install-requirements { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 14px; row-gap: 2px; font-size: 11px; margin-top: 10px; }
 .install-requirements a { text-decoration: underline; text-underline-offset: 3px; min-height: 24px; }
 .hero-actions .text-link { gap: 6px; }
-.showcase-tabs { display: flex; justify-content: center; gap: 4px; width: max-content; max-width: 100%; padding: 4px; margin: 0 auto 18px; border: 1px solid var(--line); border-radius: 999px; }
-.showcase-tabs button { min-width: 80px; min-height: 36px; padding: 6px 16px; font-size: 12px; font-weight: 500; border-radius: 999px; color: var(--muted); transition: background-color .16s ease-out, color .16s ease-out; }
-.showcase-tabs button[aria-selected=true] { color: var(--button-text); background: var(--button); }
-.showcase-viewport { max-width: 420px; margin-inline: auto; overflow: hidden; aspect-ratio: 420 / 500; border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: 0 18px 48px -28px rgb(0 0 0 / .3); }
-.showcase-viewport img { display: block; width: 100%; height: auto; }
 .source-instructions .install-block { margin-top: 16px; }
 .source-instructions .install-command { padding-left: 10px; gap: 6px; }
 .source-instructions .copy-button { flex-basis: 62px; }
@@ -182,9 +177,9 @@ h2 { font-size: clamp(30px, 3.5vw, 42px); }
   .hero { grid-template-columns: 1.4fr 1fr; }
 }
 @media (max-width: 840px) {
-  .hero { grid-template-columns: 1fr; gap: 40px; }
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   .hero-copy { max-width: 680px; }
-  .product-shot { width: 420px; max-width: 100%; margin-inline: auto; }
+  .product-shot { width: 100%; max-width: 420px; margin-inline: auto; }
 }
 @media (max-width: 1000px) {
   .shell { width: calc(100% - 64px); }
@@ -199,12 +194,12 @@ h2 { font-size: clamp(30px, 3.5vw, 42px); }
   .site-header { height: 88px; }
   .site-header nav { display: none; }
   .header-actions { margin-left: auto; }
-  .hero { grid-template-columns: 1fr; padding-block: 40px 64px; gap: 40px; }
+  .hero { grid-template-columns: minmax(0, 1fr); padding-block: 40px 64px; gap: 40px; }
   .hero-copy { min-width: 0; max-width: 580px; }
   .hero h1 { font-size: clamp(44px, 9vw, 68px); }
   .hero-description { font-size: 18px; }
   .hero-platform { margin-bottom: 20px; }
-  .product-shot { width: 492px; max-width: 100%; margin-inline: auto; }
+  .product-shot { width: 100%; max-width: 420px; margin-inline: auto; }
   .features { padding-block: 48px 56px; }
   .feature-list { grid-template-columns: 1fr; gap: 28px; }
   .feature-list p { max-width: 48ch; margin-top: 8px; }
@@ -232,10 +227,8 @@ h2 { font-size: clamp(30px, 3.5vw, 42px); }
   .install-command { gap: 7px; padding-left: 11px; }
   .install-command code { font-size: 10px; }
   .copy-button { flex-basis: 60px; }
-  .showcase-tabs button { min-height: 40px; }
   .button { font-size: 13px; padding-inline: 20px; }
   .hero-actions .text-link { font-size: 12px; }
-  .showcase-viewport { border-radius: 20px; }
   .source-instructions { padding: 18px; }
   .source-instructions pre { padding: 12px; font-size: 10px; }
   .site-footer { gap: 16px; }
@@ -284,3 +277,11 @@ h2 { font-size: clamp(30px, 3.5vw, 42px); }
   .footer-credit { margin-left: auto; }
   .site-footer--expanded > .footer-content { padding-bottom: 88px; }
 }
+
+/* The new appearance expands from the pressed control; unsupported browsers switch instantly. */
+::view-transition { pointer-events:none; }
+::view-transition-group(root) { animation:none; }
+::view-transition-old(root), ::view-transition-new(root) { animation:none; mix-blend-mode:normal; }
+::view-transition-image-pair(root) { isolation:auto; }
+
+.setup-layout > *, .privacy-section > *, .faq-section > *, .build-section > * { min-width:0; }
