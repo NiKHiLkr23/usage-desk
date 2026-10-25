@@ -60,13 +60,12 @@ struct DashboardView: View {
             ForEach(store.accounts) { account in
                 Button { store.selectedID = account.id } label: {
                     HStack(spacing: 10) {
-                        Text(String(account.label.prefix(1)).uppercased())
-                            .font(.system(size: 11, weight: .medium))
+                        ProviderIcon(provider: account.provider, size: 18)
                             .frame(width: 30, height: 30)
                             .background(DeskTheme.surface, in: RoundedRectangle(cornerRadius: 8))
                             .accessibilityHidden(true)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(account.managed ? account.label : "Current account").font(.system(size: 11, weight: .medium))
+                            Text(account.id == "current" ? "Current account" : account.label).font(.system(size: 11, weight: .medium))
                             Text(store.states[account.id]?.info?.email ?? "Sign-in needed")
                                 .font(.system(size: 9)).foregroundStyle(DeskTheme.muted)
                                 .lineLimit(1).truncationMode(.middle)
@@ -80,7 +79,7 @@ struct DashboardView: View {
                     }.padding(10).frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
                 }.buttonStyle(SidebarAccountButton(selected: store.selected?.id == account.id))
                     .accessibilityAddTraits(store.selected?.id == account.id ? .isSelected : [])
-                    .accessibilityLabel("\(account.managed ? account.label : "Current account"), \(store.states[account.id]?.info?.email ?? "Sign-in needed"), \(accountSummary(account.id))")
+                    .accessibilityLabel("\(account.provider.title), \(account.id == "current" ? "Current account" : account.label), \(store.states[account.id]?.info?.email ?? "Sign-in needed"), \(accountSummary(account.id))")
             }
             Button { AppWindows.showAccounts(store) } label: {
                 Label("Add account", systemImage: "plus")
@@ -102,18 +101,20 @@ struct DashboardView: View {
 
     private var accountSelector: some View {
         HStack(spacing: 10) {
-            Text(String((store.selected?.label ?? "A").prefix(1)).uppercased()).font(.system(size: 13, weight: .medium))
-                .frame(width: 34, height: 34).background(DeskTheme.surface, in: RoundedRectangle(cornerRadius: 8)).accessibilityHidden(true)
+            ProviderIcon(provider: store.selected?.provider ?? .codex, size: 21)
+                .frame(width: 34, height: 34).background(DeskTheme.surface, in: RoundedRectangle(cornerRadius: 8))
             VStack(alignment: .leading, spacing: 3) {
                 Menu {
-                    ForEach(store.accounts) { account in Button(account.label) { store.selectedID = account.id } }
+                    ForEach(store.accounts) { account in
+                        Button { store.selectedID = account.id } label: { HStack { ProviderIcon(provider: account.provider, size: 14); Text(account.label) } }
+                    }
                 } label: {
                     HStack(spacing: 5) {
                         Text(store.selected?.id == "current" ? "Current account" : store.selected?.label ?? "Choose account").lineLimit(1)
                         Image(systemName: "chevron.down").font(.system(size: 8, weight: .semibold))
                     }.font(.system(size: 12, weight: .medium))
                 }.menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize(horizontal: false, vertical: true).accessibilityLabel("Selected account")
-                Text(state.info?.email ?? (state.signedOut ? "Sign-in needed" : "Reading account…"))
+                Text(state.info?.email ?? (state.info != nil ? "Email not reported" : state.signedOut ? "Sign-in needed" : "Reading account…"))
                     .font(.system(size: 10)).foregroundStyle(DeskTheme.muted).lineLimit(1).textSelection(.enabled)
             }
             Spacer(minLength: 4)
@@ -143,8 +144,8 @@ struct DashboardView: View {
             }.frame(maxWidth: .infinity, alignment: .leading).deskCard()
         } else if state.signedOut || state.unsupported {
             VStack(alignment: .leading, spacing: 10) {
-                Text(state.unsupported ? "ChatGPT sign-in required" : "Connect this account").font(.system(size: 13, weight: .medium))
-                Text(state.unsupported ? "API keys do not report plan usage." : "Choose a Chrome profile and sign in with OpenAI.").font(.system(size: 11)).foregroundStyle(DeskTheme.muted)
+                Text(state.unsupported ? (store.selected?.provider == .claude ? "Claude subscription required" : "ChatGPT sign-in required") : "Connect this account").font(.system(size: 13, weight: .medium))
+                Text(store.selected?.provider == .claude ? "Sign in to the Claude CLI with your Pro or Max account, then refresh." : state.unsupported ? "API keys do not report plan usage." : "Choose a Chrome profile and sign in with OpenAI.").font(.system(size: 11)).foregroundStyle(DeskTheme.muted)
                 Button("Manage accounts") { AppWindows.showAccounts(store, selectedID: store.selected?.id) }.buttonStyle(AccentButton())
             }.frame(maxWidth: .infinity, alignment: .leading).deskCard()
         }
@@ -166,6 +167,7 @@ struct DashboardView: View {
                 ForEach(meters) { meter in MeterView(meter: meter) }
             }
         }
+        if store.selected?.provider != .claude {
         Button { navigation.usageTab = "resets"; resetTab = "earned" } label: {
             HStack {
                 Image(systemName: "arrow.counterclockwise").foregroundStyle(DeskTheme.muted)
@@ -174,12 +176,13 @@ struct DashboardView: View {
                 Image(systemName: "chevron.right").font(.system(size: 9))
             }.font(.system(size: 11)).padding(.horizontal, 1)
         }.buttonStyle(DeskButton())
+        }
     }
 
     private func resetsContent(_ usage: UsageSnapshot) -> some View {
         VStack(alignment: .leading, spacing: 13) {
-            DeskTabs(selection: $navigation.resetTab, items: [("earned", "Earned", "gift"), ("schedule", "Schedule", "clock")])
-            if resetTab == "earned" { EarnedView(earned: usage.rateLimitResetCredits) }
+            if store.selected?.provider != .claude { DeskTabs(selection: $navigation.resetTab, items: [("earned", "Earned", "gift"), ("schedule", "Schedule", "clock")]) }
+            if resetTab == "earned" && store.selected?.provider != .claude { EarnedView(earned: usage.rateLimitResetCredits) }
             else {
                 ForEach(usage.meters.sorted { ($0.resetDate ?? .distantFuture) < ($1.resetDate ?? .distantFuture) }) { meter in
                     TimelineView(.periodic(from: .now, by: 30)) { context in

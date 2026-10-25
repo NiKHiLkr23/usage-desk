@@ -38,6 +38,8 @@ struct PendingLogin {
     private let storage: AccountStorage
     private var storageWritable = true
     private var clients: [String: CodexClient] = [:]
+    private var claudeClients: [String: ClaudeClient] = [:]
+    @Published var claudeExecutablePath: String { didSet { preferences.set(claudeExecutablePath, forKey: "claudeExecutable") } }
     private var clientIDs: [String: UUID] = [:]
     private var refreshes: [String: Task<Void, Never>] = [:]
     private var polling: Task<Void, Never>?
@@ -61,6 +63,7 @@ struct PendingLogin {
         refreshInterval = [60, 120, 300].contains(defaults.integer(forKey: "refreshInterval")) ? defaults.integer(forKey: "refreshInterval") : 60
         showMenuPercent = defaults.object(forKey: "showMenuPercent") as? Bool ?? true
         executablePath = defaults.string(forKey: "codexExecutable") ?? Self.findCodex()
+        claudeExecutablePath = defaults.string(forKey: "claudeExecutable") ?? Self.findClaude()
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         let root = ProcessInfo.processInfo.environment["RESET_DESK_DATA_DIR"].map { URL(fileURLWithPath: $0) } ?? support.appendingPathComponent("ResetDesk", isDirectory: true)
         storage = AccountStorage(root: root)
@@ -92,6 +95,18 @@ struct PendingLogin {
         let candidates = ["\(home)/.local/bin/codex", "/opt/homebrew/bin/codex", "/usr/local/bin/codex"]
             + (ProcessInfo.processInfo.environment["PATH"] ?? "").split(separator: ":").map { "\($0)/codex" }
         return candidates.first { FileManager.default.isExecutableFile(atPath: $0) } ?? "\(home)/.local/bin/codex"
+    }
+
+    static func findClaude() -> String {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let candidates = ["\(home)/.local/bin/claude", "/opt/homebrew/bin/claude", "/usr/local/bin/claude"]
+            + (ProcessInfo.processInfo.environment["PATH"] ?? "").split(separator: ":").map { "\($0)/claude" }
+        if let path = candidates.first(where: { FileManager.default.isExecutableFile(atPath: $0) }) { return path }
+        let nvm = URL(fileURLWithPath: home).appendingPathComponent(".nvm/versions/node")
+        let versions = (try? FileManager.default.contentsOfDirectory(at: nvm, includingPropertiesForKeys: nil)) ?? []
+        return versions.sorted { $0.lastPathComponent.compare($1.lastPathComponent, options: .numeric) == .orderedDescending }
+            .map { $0.appendingPathComponent("bin/claude").path }
+            .first(where: { FileManager.default.isExecutableFile(atPath: $0) }) ?? "\(home)/.local/bin/claude"
     }
 
     func reloadChromeProfiles() {
@@ -137,6 +152,10 @@ struct PendingLogin {
                 refreshes[id] = nil
             }
             do {
+                if account.provider == .claude {
+                    try await refreshClaude(account)
+                    return
+                }
                 let client = try client(for: account)
                 let read = try await client.call("account/read", as: AccountRead.self)
                 guard accounts.contains(where: { $0.id == id }) else { return }
@@ -159,6 +178,50 @@ struct PendingLogin {
         await task.value
     }
 
+    private func refreshClaude(_ account: LocalAccount) async throws {
+        guard FileManager.default.isExecutableFile(atPath: claudeExecutablePath) else {
+            throw DeskError.message("Claude CLI was not found. Choose its executable in Preferences.")
+        }
+        let client: ClaudeClient
+        if let existing = claudeClients[account.id] { client = existing }
+        else {
+            client = ClaudeClient(executable: URL(fileURLWithPath: claudeExecutablePath), home: URL(fileURLWithPath: account.home))
+            claudeClients[account.id] = client
+        }
+        let read = try await client.read()
+        guard accounts.contains(where: { $0.id == account.id }) else { return }
+        var current = states[account.id] ?? AccountState()
+        if current.info?.email != read.info?.email { current.usage = nil; current.updated = nil }
+        current.info = read.info
+        current.signedOut = read.info == nil
+        current.unsupported = read.info != nil && read.usage == nil
+        current.usage = read.usage
+        current.updated = read.usage == nil ? nil : Date()
+        current.error = nil
+        states[account.id] = current
+    }
+
+    /// Track an existing CLI profile; Claude owns browser login and credentials.
+    func connectClaude(label: String, home: String) throws -> String {
+        guard !isDemo, storageWritable else { throw DeskError.message("Account changes are unavailable in this mode.") }
+        let label = label.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !label.isEmpty, label.count <= 80 else { throw DeskError.message("Enter a label of up to 80 characters.") }
+        guard accounts.count < 12 else { throw DeskError.message("You can track up to 12 profiles.") }
+        guard home.rangeOfCharacter(from: .controlCharacters) == nil else { throw DeskError.message("Choose a valid Claude configuration folder.") }
+        let folder = URL(fileURLWithPath: NSString(string: home).expandingTildeInPath).standardizedFileURL
+        var isDirectory: ObjCBool = false
+        guard home.hasPrefix("/") || home.hasPrefix("~/"), FileManager.default.fileExists(atPath: folder.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+            throw DeskError.message("Choose an existing Claude CLI configuration folder. The default is ~/.claude.")
+        }
+        guard !accounts.contains(where: { $0.provider == .claude && URL(fileURLWithPath: $0.home).resolvingSymlinksInPath() == folder.resolvingSymlinksInPath() }) else {
+            throw DeskError.message("That Claude CLI profile is already in your accounts.")
+        }
+        let account = LocalAccount(label: label, home: folder.path, managed: false, provider: .claude)
+        try storage.save(accounts + [account])
+        accounts.append(account); selectedID = account.id; states[account.id] = AccountState()
+        return account.id
+    }
+
     func createAccount(label: String, chromeProfile: String?, expectedEmail: String?) throws -> String {
         guard !isDemo else { throw DeskError.message("Demo mode uses sample accounts. Open the regular app to connect your own.") }
         guard storageWritable else { throw DeskError.message("Repair saved account settings before adding an account.") }
@@ -175,7 +238,7 @@ struct PendingLogin {
     func beginSignIn(_ id: String, chromeProfile: String?) async throws {
         guard !isDemo else { throw DeskError.message("Demo mode cannot start sign-in.") }
         guard pendingLogin == nil else { throw DeskError.message("Finish or cancel the current sign-in first.") }
-        guard let account = accounts.first(where: { $0.id == id }), account.managed else {
+        guard let account = accounts.first(where: { $0.id == id }), account.managed, account.provider == .codex else {
             throw DeskError.message("Sign in to the current CLI account using codex login in Terminal.")
         }
         // Reserve before suspension so two button presses cannot start callbacks.
@@ -283,6 +346,7 @@ struct PendingLogin {
         if selectedID == id { selectedID = "current" }
         clientIDs.removeValue(forKey: id)
         await clients.removeValue(forKey: id)?.close()
+        await claudeClients.removeValue(forKey: id)?.close()
         states.removeValue(forKey: id)
         // Local credentials are retained. Removing a card never logs out or
         // deletes the user's Codex authentication.
@@ -292,6 +356,9 @@ struct PendingLogin {
         guard pendingLogin == nil else { message = "Finish sign-in before changing the CLI executable."; return }
         for client in clients.values { await client.close() }
         clients.removeAll(); clientIDs.removeAll()
+        for client in claudeClients.values { await client.close() }
+        claudeClients.removeAll()
+        for task in refreshes.values { await task.value }
         await refreshAll()
     }
 
@@ -307,6 +374,7 @@ struct PendingLogin {
     func shutdown() {
         polling?.cancel(); loginTimeout?.cancel()
         for client in clients.values { Task { await client.close() } }
+        for client in claudeClients.values { Task { await client.close() } }
     }
 }
 

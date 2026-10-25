@@ -31,6 +31,23 @@ Select an account in a compact list, or expand the same panel to manage its conn
   Follow [OpenAI's Codex documentation](https://developers.openai.com/codex/cli/) to install and sign in.
 - Chrome is optional. Multiple Chrome profiles can make multiple-account sign-in easier.
 
+## Claude accounts
+
+Choose **Add account → Claude**, enter a label, and connect your existing Claude CLI profile.
+The default is `~/.claude`. If T3 Code sets `CLAUDE_CONFIG_DIR`, choose that same directory.
+Usage Desk reads the account returned by Claude CLI and displays five-hour and weekly quota
+windows. Additional CLI profiles can be connected separately; existing Codex profiles remain Codex.
+
+Claude Code must be installed and signed in with a Pro or Max subscription. Choose its executable
+in Preferences if it is not detected. If needed, the connection page provides a **Copy sign-in
+command** action; run that command in Terminal, complete Claude's browser sign-in, then Refresh.
+No API key, browser-cookie extraction, or status-line/settings modification is required.
+
+The Claude connector uses the CLI's **experimental** `initialize` / `get_usage` control protocol,
+including `skip_behaviors: true`. It never submits a model prompt or scans transcript content.
+CLI protocol changes may require an update. Unavailable data is reported explicitly, and earned
+reset credits are not inferred from quota windows. The connector is independent of T3 sessions.
+
 ## Build and run
 
 With macOS 14+ and Xcode Command Line Tools providing Swift 6+, run:

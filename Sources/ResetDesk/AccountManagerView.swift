@@ -16,11 +16,14 @@ struct AccountManagerView: View {
                     VStack(spacing: 5) {
                         ForEach(store.accounts) { account in
                             Button { selection = account.id } label: {
-                                VStack(alignment: .leading, spacing: 5) {
+                                HStack(spacing: 8) {
+                                    ProviderIcon(provider: account.provider, size: 16)
+                                    VStack(alignment: .leading, spacing: 5) {
                                     Text(account.label).font(.system(size: 12, weight: .medium))
                                     Text(store.states[account.id]?.info?.email ?? (account.managed ? "Sign-in needed" : "Current CLI"))
                                         .font(.system(size: 10)).foregroundStyle(DeskTheme.muted).lineLimit(1).truncationMode(.middle)
                                         .help(store.states[account.id]?.info?.email ?? "Sign-in needed")
+                                    }
                                 }.frame(maxWidth: .infinity, alignment: .leading).padding(11)
                                     .contentShape(Rectangle())
                             }.buttonStyle(SidebarAccountButton(selected: selection == account.id))
@@ -32,7 +35,7 @@ struct AccountManagerView: View {
             }.frame(width: 184).background(DeskTheme.surface)
             Divider().overlay(DeskTheme.line)
             ScrollView {
-                if let id = selection, let account = store.accounts.first(where: { $0.id == id }), !account.managed {
+                if let id = selection, let account = store.accounts.first(where: { $0.id == id }), !account.managed, account.provider == .codex {
                     VStack(alignment: .leading, spacing: 18) {
                         Text(account.label).font(.system(size: 26, weight: .medium))
                         Text(store.states[id]?.info?.email ?? "No account email reported").textSelection(.enabled)
@@ -56,7 +59,7 @@ struct AccountManagerView: View {
                     guard let account = removal else { return }
                     Task { do { try await store.removeAccount(account.id); selection = nil; removal = nil } catch { store.message = error.localizedDescription } }
                 }
-            } message: { Text("This stops tracking the account. Its local Codex sign-in is retained.") }
+            } message: { Text("This stops tracking the account. Its local CLI sign-in is retained.") }
     }
 }
 
@@ -83,6 +86,22 @@ struct AddAccountView: View {
                 Text(account == nil && profileID == nil ? "Add account" : "Account connection").font(.system(size: 23, weight: .medium)).tracking(-0.5)
                 Spacer()
             }
+            if currentID == nil {
+                HStack(spacing: 10) {
+                    ForEach(AccountProvider.allCases) { provider in
+                        Button { draft.provider = provider } label: {
+                            HStack(spacing: 8) { ProviderIcon(provider: provider, size: 20); Text(provider.title).font(.system(size: 12, weight: .medium)); Spacer(); if draft.provider == provider { Image(systemName: "checkmark").font(.system(size: 10)) } }
+                                .padding(12).frame(maxWidth: .infinity).contentShape(Rectangle())
+                        }.buttonStyle(.plain)
+                            .background(draft.provider == provider ? DeskTheme.hover : DeskTheme.background, in: RoundedRectangle(cornerRadius: 10))
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(draft.provider == provider ? DeskTheme.text : DeskTheme.line, lineWidth: 1))
+                            .accessibilityAddTraits(draft.provider == provider ? .isSelected : [])
+                    }
+                }
+            }
+            if (account?.provider ?? draft.provider) == .claude {
+                ClaudeAccountConnectionView(store: store, account: account, draft: draft, created: created, remove: remove)
+            } else {
             Text("Choose a Chrome profile. Sign in with the OpenAI account you want to track.").font(.system(size: 12)).foregroundStyle(DeskTheme.muted)
             if currentID == nil {
                 VStack(alignment: .leading, spacing: 8) {
@@ -140,6 +159,7 @@ struct AddAccountView: View {
             if let error = error ?? state?.error { Text(error).font(.system(size: 11)).foregroundStyle(DeskTheme.amber).textSelection(.enabled) }
             Text("OpenAI handles sign-in in your browser. Credentials stay on this Mac.").font(.system(size: 10)).foregroundStyle(DeskTheme.muted)
             if let account { Button("Remove from Usage desk", role: .destructive) { remove(account) }.font(.system(size: 11)) }
+            }
         }.frame(maxWidth: .infinity, alignment: .leading)
 
     }

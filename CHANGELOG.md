@@ -1,6 +1,15 @@
 # Changelog
 
-## Unreleased — 0.1.0
+## Unreleased — 0.1.1
+
+- Claude Pro/Max quota windows and reset times through an existing Claude CLI sign-in.
+- Codex/Claude provider selection and provider icons throughout the account interface.
+- Claude profile-directory and executable selection, including installations managed by nvm.
+- Preserve macOS user context for Claude Keychain sign-in and permit usage reads while
+  disabling telemetry, error reporting, feedback, and automatic updates.
+- Shared version source and version/build information in Preferences.
+
+## 0.1.0 — initial source version
 
 - Native macOS menu bar panel for Codex usage and reset windows.
 - Earned reset information when provided by Codex.

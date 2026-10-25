@@ -59,3 +59,26 @@ Its product images are actual macOS app captures with account details anonymized
 GitHub actions use direct static HTTPS links. `release.json` records the repository URL for tooling;
 the website does not fetch metadata or enable binary downloads. Local review archives are excluded
 from the web root. See [website configuration](../website/README.md).
+
+## Claude provider
+
+`LocalAccount.provider` selects Codex or Claude. Absent provider fields decode as Codex; unknown
+provider values fail decoding instead of being relabeled. Account homes and storage identifiers
+retain their existing meaning. Claude metadata tracks an existing CLI configuration directory.
+
+`ClaudeClient` starts a short-lived CLI control connection in a private empty working directory.
+It sends only `initialize` and `get_usage` (`skip_behaviors: true`), correlates replies, refuses
+CLI tool requests, bounds buffered output, uses a 45-second per-request deadline, and closes
+on success, failure, timeout, or removal. It never sends a user message. Hooks, project settings,
+MCP servers, tools, and session persistence are disabled for the probe; inherited API keys and
+provider overrides are not forwarded. Claude CLI owns authentication and token refresh.
+
+The control request is experimental in Anthropic SDK 0.3.309. Schema changes produce a recoverable
+error, not guessed usage. T3's headless sessions do not run status-line commands; independent
+usage reads avoid that dependency. Sources used to verify the wire format:
+- https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk
+- https://github.com/pingdotgg/t3code/blob/main/apps/server/src/provider/ClaudeProvider.ts
+- https://github.com/pingdotgg/t3code/blob/main/apps/server/src/provider/claudeUsageLimits.ts
+
+Normal tests use only `Fixtures/fake-claude.py`. A live check requires explicitly setting
+`RESET_DESK_LIVE_CLAUDE` to the CLI path; it does not print account identity, limits, or raw replies.

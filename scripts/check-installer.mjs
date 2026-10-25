@@ -88,7 +88,9 @@ try {
   }
   if(['unsupported-os','root','old-macos','missing-toolchain','old-swift','existing-symlink'].includes(scenario))assert.ok(!calls.includes('git '),`${scenario}: must not fetch source`);
   if(['fetch-failed','wrong-commit'].includes(scenario))assert.ok(!calls.includes('zsh '),`${scenario}: must not build unverified source`);
-  const retained=await readdir(scratch);
+  // Apple's python3 launcher may create this toolchain cache before the PTY driver starts.
+  // It is not an installer-owned artifact; continue checking every other temporary file.
+  const retained=(await readdir(scratch)).filter(name=>name!=='xcrun_db');
   if(['fetch-failed','wrong-commit','build-failed','bad-signature','copy-failed','installed-signature-failed'].includes(scenario)){
    assert.equal(retained.length,1,`${scenario}: retain only the diagnostic log`);
    assert.ok(retained[0].startsWith('usage-desk-install-log.'));

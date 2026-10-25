@@ -28,6 +28,7 @@ import ResetDeskCore
     @Published var usageTab = "usage"
     @Published var resetTab = "earned"
     @Published var executableDraft: String?
+    @Published var claudeExecutableDraft: String?
     private var accountDrafts: [String: AccountFormDraft] = [:]
     func draft(for account: LocalAccount?) -> AccountFormDraft {
         let key = account?.id ?? "new"
@@ -192,10 +193,14 @@ struct DeskRootView: View {
 }
 
 @MainActor final class AccountFormDraft: ObservableObject {
+    @Published var provider: AccountProvider
+    @Published var claudeHome: String
     @Published var label: String
     @Published var chrome: String
     @Published var email: String
     init(account: LocalAccount?) {
+        provider = account?.provider ?? .codex
+        claudeHome = account?.home ?? (ProcessInfo.processInfo.environment["CLAUDE_CONFIG_DIR"] ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude").path)
         label = account?.label ?? ""
         chrome = account?.chromeProfile ?? "default-browser"
         email = account?.expectedEmail ?? ""

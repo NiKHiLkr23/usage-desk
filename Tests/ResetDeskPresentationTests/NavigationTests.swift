@@ -63,6 +63,21 @@ final class NavigationTests: XCTestCase {
         XCTAssertEqual(next.email, "")
     }
 
+    @MainActor func testProviderChoiceSurvivesNavigationAndNewDraftResets() async {
+        let navigation = DeskNavigation()
+        let draft = navigation.draft(for: nil)
+        draft.provider = .claude
+        draft.claudeHome = "/synthetic/claude-work"
+        navigation.page = .accounts
+        navigation.showPreferences(); navigation.back()
+        XCTAssertEqual(navigation.draft(for: nil).provider, .claude)
+        XCTAssertEqual(navigation.draft(for: nil).claudeHome, "/synthetic/claude-work")
+        navigation.createdAccount("claude-work")
+        let saved = LocalAccount(id: "claude-work", label: "Work", home: "/synthetic/claude-work", managed: false, provider: .claude)
+        XCTAssertTrue(navigation.draft(for: saved) === draft)
+        XCTAssertEqual(navigation.draft(for: nil).provider, .codex)
+    }
+
     @MainActor func testBackRestoresResetsAndCompactSize() async {
         let navigation = DeskNavigation()
         navigation.usageTab = "resets"

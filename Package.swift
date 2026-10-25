@@ -7,7 +7,7 @@ let package = Package(
     products: [.executable(name: "ResetDesk", targets: ["ResetDesk"])],
     targets: [
         .target(name: "ResetDeskCore"),
-        .executableTarget(name: "ResetDesk", dependencies: ["ResetDeskCore"]),
+        .executableTarget(name: "ResetDesk", dependencies: ["ResetDeskCore"], resources: [.process("Resources")]),
         .testTarget(name: "ResetDeskPresentationTests", dependencies: ["ResetDesk"]),
         .testTarget(name: "ResetDeskCoreTests", dependencies: ["ResetDeskCore"], resources: [.copy("Fixtures")]),
     ],

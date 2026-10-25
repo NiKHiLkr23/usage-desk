@@ -2,6 +2,8 @@
 set -euo pipefail
 task_root="${0:A:h:h}"
 cd "$task_root"
+app_version="$(cat "$task_root/VERSION")"
+[[ "$app_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { print -u2 "Invalid VERSION"; exit 1; }
 demo=false
 universal=false
 for option in "$@"; do
@@ -22,7 +24,9 @@ if $demo; then app_name="Usage Desk Demo"; fi
 app_dir="$task_root/dist/$app_name.app"
 mkdir -p "$app_dir/Contents/MacOS" "$app_dir/Contents/Resources"
 cp "$binary_dir/ResetDesk" "$app_dir/Contents/MacOS/ResetDesk"
+cp -R "$binary_dir/ResetDesk_ResetDesk.bundle" "$app_dir/Contents/Resources/"
 cp "$task_root/Support/Info.plist" "$app_dir/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $app_version" "$app_dir/Contents/Info.plist"
 cp "$task_root/assets/brand/UsageDesk.icns" "$app_dir/Contents/Resources/UsageDesk.icns"
 if $demo; then
   /usr/libexec/PlistBuddy -c 'Set :CFBundleIdentifier in.nikhilkr.resetdesk.demo' "$app_dir/Contents/Info.plist"

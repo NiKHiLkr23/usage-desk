@@ -41,3 +41,16 @@ Public product images are actual app captures with the email permanently replace
 The original unredacted image is not in the repository. The optional screenshot-mode app
 uses synthetic accounts and never reads real accounts. Sanitize all screenshots and diagnostics
 before contributing.
+
+## Claude CLI accounts
+
+Claude connections store the provider, a user-supplied label, and the selected existing CLI
+configuration directory. The app does not read Claude credential files or browser cookies.
+Claude CLI reads its own sign-in and communicates directly with Anthropic for usage. It may
+perform its ordinary credential refresh. The app does not modify your Claude settings.
+
+Usage probes never send a model prompt. `skip_behaviors: true` skips the optional transcript
+scan. Only account identity, plan, reported quota percentages, and reset times are decoded
+for display. Output remains in memory, subprocess stderr is discarded, temporary working
+directories are removed, and backend failures use generic messages. Removing a profile
+retains its CLI directory and sign-in.

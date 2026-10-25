@@ -17,10 +17,10 @@ public struct AccountStorage {
         try data.write(to: file, options: .atomic)
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file.path)
     }
-    public func makeAccount(label: String, chromeProfile: String?, expectedEmail: String?) throws -> LocalAccount {
+    public func makeAccount(label: String, chromeProfile: String?, expectedEmail: String?, provider: AccountProvider = .codex) throws -> LocalAccount {
         let id = UUID().uuidString
         let home = root.appendingPathComponent("accounts", isDirectory: true).appendingPathComponent(id, isDirectory: true)
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
-        return LocalAccount(id: id, label: label, home: home.path, chromeProfile: chromeProfile, expectedEmail: expectedEmail)
+        return LocalAccount(id: id, label: label, home: home.path, chromeProfile: chromeProfile, expectedEmail: expectedEmail, provider: provider)
     }
 }

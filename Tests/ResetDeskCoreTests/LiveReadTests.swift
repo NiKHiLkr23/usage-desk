@@ -16,6 +16,18 @@ final class LiveReadTests: XCTestCase {
             await client.close()
         } catch { await client.close(); throw error }
     }
+    func testSignedInClaudeCanReadUsageWithoutPrompt() async throws {
+        guard let path = ProcessInfo.processInfo.environment["RESET_DESK_LIVE_CLAUDE"] else {
+            throw XCTSkip("Set RESET_DESK_LIVE_CLAUDE to opt into a usage-only live check.")
+        }
+        let home = ProcessInfo.processInfo.environment["CLAUDE_CONFIG_DIR"].map { URL(fileURLWithPath: $0) }
+            ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude")
+        let client = ClaudeClient(executable: URL(fileURLWithPath: path), home: home)
+        let read = try await client.read()
+        XCTAssertNotNil(read.info, "Claude CLI must be signed in")
+        XCTAssertFalse(read.usage?.meters.isEmpty ?? true, "Claude subscription must return usage windows")
+    }
+
     func testTwoLiveProfilesCanPrepareAndCancelLogin() async throws {
         guard let path = ProcessInfo.processInfo.environment["RESET_DESK_LIVE_LOGIN"] else { throw XCTSkip("Set RESET_DESK_LIVE_LOGIN to test isolated login preparation without opening a browser.") }
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)

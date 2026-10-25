@@ -1,20 +1,41 @@
 import Foundation
 
+public enum AccountProvider: String, Codable, CaseIterable, Identifiable, Sendable {
+    case codex, claude
+    public var id: String { rawValue }
+    public var title: String { self == .codex ? "Codex" : "Claude" }
+}
+
 public struct LocalAccount: Codable, Identifiable, Equatable, Sendable {
     public var id: String
     public var label: String
     public var home: String
     public var managed: Bool
+    public var provider: AccountProvider
     public var chromeProfile: String?
     public var expectedEmail: String?
-    public init(id: String = UUID().uuidString, label: String, home: String, managed: Bool = true, chromeProfile: String? = nil, expectedEmail: String? = nil) {
+    public init(id: String = UUID().uuidString, label: String, home: String, managed: Bool = true, chromeProfile: String? = nil, expectedEmail: String? = nil, provider: AccountProvider = .codex) {
         self.id = id; self.label = label; self.home = home; self.managed = managed
+        self.provider = provider
         self.chromeProfile = chromeProfile; self.expectedEmail = expectedEmail
+    }
+    private enum CodingKeys: String, CodingKey { case id, label, home, managed, chromeProfile, expectedEmail, provider }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        label = try c.decode(String.self, forKey: .label)
+        home = try c.decode(String.self, forKey: .home)
+        managed = try c.decode(Bool.self, forKey: .managed)
+        chromeProfile = try c.decodeIfPresent(String.self, forKey: .chromeProfile)
+        expectedEmail = try c.decodeIfPresent(String.self, forKey: .expectedEmail)
+        provider = try c.decodeIfPresent(AccountProvider.self, forKey: .provider) ?? .codex
     }
 }
 
 public struct AccountRead: Decodable, Sendable {
-    public struct Info: Decodable, Sendable { public var type: String; public var email: String?; public var planType: String? }
+    public struct Info: Decodable, Sendable { public var type: String; public var email: String?; public var planType: String?
+        public init(type: String, email: String?, planType: String?) { self.type = type; self.email = email; self.planType = planType }
+    }
     public struct Routing: Decodable, Sendable { public var chatgptAccountId: String }
     public var account: Info?
     public var workspaceRouting: Routing?

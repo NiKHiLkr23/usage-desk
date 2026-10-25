@@ -58,7 +58,7 @@ final class CoreTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: root) }
         let storage = AccountStorage(root: root)
         let first = try storage.makeAccount(label: "Personal", chromeProfile: "Default", expectedEmail: "one@example.test")
-        let second = try storage.makeAccount(label: "Work", chromeProfile: "Profile 2", expectedEmail: "two@example.test")
+        let second = try storage.makeAccount(label: "Work", chromeProfile: nil, expectedEmail: "two@example.test", provider: .claude)
         XCTAssertNotEqual(first.home, second.home)
         try storage.save([first, second])
         XCTAssertEqual(try storage.load(), [first, second])
