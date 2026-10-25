@@ -4,8 +4,8 @@
 
 A small native macOS utility for people tracking Codex and Claude quotas across accounts. Lead with
 what it does, the source-install command, and an interactive app preview. GitHub stars are a secondary
-community action. Keep requirements beside the command: local compilation, macOS 14+,
-Swift 6+, Xcode Command Line Tools, and an installed/signed-in Codex or Claude CLI for app use.
+community action. Keep the hero focused on the product, install command and actions.
+Put build requirements and script inspection in the lower installation section.
 
 ## Existing design system
 
