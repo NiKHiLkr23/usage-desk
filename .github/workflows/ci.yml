@@ -21,6 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          # Source-installer checks inspect the pinned ancestor commit.
+          fetch-depth: 0
           persist-credentials: false
       - name: Toolchain
         run: swift --version
