@@ -4,13 +4,13 @@
 live CLI compatibility, a fresh-Mac installation, and Vercel Analytics activation still need
 release-time verification. Local checks do not establish those production behaviors.
 
-Reviewed 2026-10-25: `codex/v0.1.1-refactor` through `fbeedce`, compared with merge-base
+Reviewed 2026-10-25: `codex/v0.1.1-refactor` through source checkpoint `2380b3a` and its distribution metadata, compared with merge-base
 `838fd7219fe9db38f56427e3d426f872f245934a` of the locally known `origin/main`. No fetch was
-performed. Scope includes the 88 changed files, their native/account callers, source-release
-and CI configuration, and the 161 publishable files. The implementation was committed before
-the final review; only this report is added afterward. The portfolio repository is outside scope.
+performed. Scope includes the 90 changed files, their native/account callers, source-release
+and CI configuration, and the 162 publishable files. The implementation was committed before
+the final review; only distribution metadata and this report are updated afterward. The portfolio repository is outside scope.
 
-The app source checkpoint is `53883b436afb1e506be9d4832be580a3cf4860a5`, version 0.1.1,
+The app source checkpoint is `2380b3a231de5c141b7d791de575f1159bb26790`, version 0.1.1,
 build 2. `website/install.sh` and `website/release.json` agree on that checkpoint. Distribution
 remains source-only: local compilation and ad-hoc signing, with no public app binary,
 Developer ID identity, notarization, or Gatekeeper changes. The production domain is
@@ -67,13 +67,13 @@ Completed during implementation, before the final read-only review:
 
 | Check | Evidence |
 | --- | --- |
-| `swift test --scratch-path .build --cache-path .cache` | 43 passed, 3 explicit live-account tests skipped; zero failures. |
+| `swift test --scratch-path .build --cache-path .cache` | 44 passed, 3 explicit live-account tests skipped; zero failures. |
 | `zsh scripts/build.sh --universal` | Apple Silicon and Intel release build succeeded. |
 | `lipo -archs` and `codesign --verify --strict` on the built app | arm64 + x86_64; local ad-hoc signature verified. |
-| `node scripts/check-website.mjs` | 360 structural, SEO, local-link, metadata and publishable-file checks passed across 161 public files. Includes JS syntax, analytics privacy checks and 23 isolated installer scenarios with no network or real installation. |
+| `node scripts/check-website.mjs` | 361 structural, SEO, local-link, metadata and publishable-file checks passed across 162 public files. Includes JS syntax, analytics privacy checks and 23 isolated installer scenarios with no network or real installation. |
 | `node scripts/check-release.mjs` | Passed synthetic source-pin/version/checksum, text-only output, dirty-tree/tag rejection and website-promotion scenarios. |
 | `node scripts/version.mjs --check` | Version and structured-data/CSP metadata consistent. |
-| Native AppKit motion probe | 41 presentation-layer samples, 31 distinct circle radii; rapid reversal kept at most one overlay, cleanup left zero, missing-anchor fallback applied. Synthetic window only. |
+| Native theme regression and integration probe | Reproduced the original defect in the actual SwiftUI panel: the NSImageView stayed attached but SwiftUI removed its backing layer/mask. An AppKit-owned container now keeps the overlay in the displayed layer tree. The new regression verifies mask retention through appearance updates, one overlay during reversal and cleanup. The earlier 41-sample/31-radius probe alone did not establish visibility. Synthetic accounts only. |
 | Local browser interaction checks | Usage/Resets/Accounts, earned/scheduled resets, Codex/Claude selection, account settings, escaped name edits, Saved feedback, draft retention across Preferences, keyboard tab/menu controls and synchronized theme controls worked. Circular website reveal was observed. |
 | Responsive/browser checks | Desktop and 375px viewport checked; narrow-layout overflow was corrected. No console warnings or errors observed on the final preview. Temporary viewport override was reset. |
 | Publication hygiene | Publishable-file/history pattern scans found no matches; `git diff --check` passed. No production service, real account or personal screenshot was used for verification. |
@@ -86,8 +86,8 @@ does not change runtime behavior.
 Remaining checks and decisions:
 
 1. Finish the maintainer's native app test on the new build: appearance reveal in both directions,
-   hover effects, rapid clicks, dismissal/reopen and Reduce Motion. The running app was not quit or
-   replaced during this work; reopen the new build to load the added reveal.
+   hover effects, rapid clicks, dismissal/reopen and Reduce Motion. The installed/running app was not automatically relaunched; reopen the newly built app
+   to load the corrected reveal.
 2. Confirm current Codex and Claude CLI sign-in/usage behavior explicitly before release. Offline
    fixtures cannot establish compatibility with a particular installed CLI or live provider. No live
    account test was opted into here, and no active Codex/T3 login was changed.
