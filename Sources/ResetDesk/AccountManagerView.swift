@@ -36,7 +36,7 @@ struct AccountManagerView: View {
                         if let selection { proxy.scrollTo(selection, anchor: .center) }
                     }
                 }
-                AddAccountMenu(store: store).padding(16)
+                AddAccountButton(store: store).padding(16)
             }.frame(width: 184).background(DeskTheme.surface)
             Divider().overlay(DeskTheme.line)
             ScrollView {

@@ -5,7 +5,9 @@ account hit targets, and interruptible size transitions with Reduce Motion suppo
 
 ## Providers
 
-Add account begins with Codex / Claude choices, each with a provider icon; Claude uses #D97757 orange.
+Add account opens the shared form directly from every entry point. Codex / Claude choices
+live on the form, each with a provider icon; Claude uses #D97757 orange. Preserve an unfinished
+draft and its provider when returning to Add account.
 Keep one account list and the existing Usage / Resets / Accounts tabs. Provider identity
 travels with each stored profile; pre-provider saved profiles decode as Codex.
 Use provider marks in the selected account header, quick account list, account menu, and

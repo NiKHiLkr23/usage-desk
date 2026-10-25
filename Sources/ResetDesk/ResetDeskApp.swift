@@ -51,8 +51,7 @@ import ResetDeskCore
         accountSelection = selectedID
         page = .accounts
     }
-    func addAccount(provider: AccountProvider) {
-        draft(for: nil).provider = provider
+    func addAccount() {
         manageAccounts(selectedID: nil)
     }
     func showTab(_ tab: String) { usageTab = tab; page = .usage }
@@ -175,7 +174,7 @@ struct DeskRootView: View {
         show(store)
     }
     static func showTab(_ store: AccountStore, tab: String) { navigation.showTab(tab); show(store) }
-    static func addAccount(_ store: AccountStore, provider: AccountProvider) { navigation.addAccount(provider: provider); show(store) }
+    static func addAccount(_ store: AccountStore) { navigation.addAccount(); show(store) }
     static func showSettings(_ store: AccountStore) { navigation.showPreferences(); show(store) }
 
     private static func resize() {

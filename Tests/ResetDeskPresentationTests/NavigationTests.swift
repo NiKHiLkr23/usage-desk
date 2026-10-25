@@ -111,12 +111,13 @@ final class NavigationTests: XCTestCase {
         XCTAssertEqual(navigation.resetTab, "schedule")
     }
 
-    @MainActor func testProviderShortcutRetainsUnfinishedDraftAndAccountPosition() {
+    @MainActor func testDirectAddAccountRetainsProviderDraftAndAccountPosition() {
         let navigation = DeskNavigation()
         navigation.showTab("accounts")
         navigation.accountScrollID = "lab"
         navigation.draft(for: nil).label = "Unfinished work account"
-        navigation.addAccount(provider: .claude)
+        navigation.draft(for: nil).provider = .claude
+        navigation.addAccount()
         XCTAssertEqual(navigation.page, .accounts)
         XCTAssertNil(navigation.accountSelection)
         XCTAssertEqual(navigation.draft(for: nil).provider, .claude)

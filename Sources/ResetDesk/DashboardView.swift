@@ -72,7 +72,7 @@ struct DashboardView: View {
                     }
                 }.scrollTargetLayout()
             }
-            AddAccountMenu(store: store)
+            AddAccountButton(store: store)
                 .padding(.top, 2)
         }
     }
@@ -135,11 +135,7 @@ struct DashboardView: View {
                     }
                     Divider()
                     Button("Edit this account…", systemImage: "pencil") { AppWindows.showAccounts(store, selectedID: store.selected?.id) }
-                    Menu("Add account", systemImage: "plus") {
-                        ForEach(AccountProvider.allCases) { provider in
-                            Button(provider.title) { AppWindows.addAccount(store, provider: provider) }
-                        }
-                    }
+                    Button("Add account", systemImage: "plus") { AppWindows.addAccount(store) }
                 } label: {
                     HStack(spacing: 5) {
                         Text(store.selected?.label ?? "Choose account").lineLimit(1)

@@ -14,7 +14,7 @@
 - Account-settings gears and Preferences sliders move forward once on hover, hold their position, and reset on exit, with Reduce Motion support.
 
 - Per-account editing with saved display names, a direct header shortcut, and retained CLI credentials on removal.
-- Quick account rows open usage immediately and show quota/reset summaries; Add account preselects Codex or Claude.
+- Quick account rows open usage immediately and show quota/reset summaries; Add account opens the form directly, with Codex or Claude selection on the form.
 - Successful connections open usage automatically; failed or mismatched connections stay in account management.
 - Claude orange provider marks, semantic quota colors, and Command-1/2/3 and Command-comma navigation.
 
