@@ -116,7 +116,8 @@ and Claude communicates with Anthropic for authentication and usage reads. Added
 Labels are in `accounts.json` beside that folder. Codex stores credentials locally; treat these
 files as sensitive. The existing bundle identifier and `ResetDesk` storage name remain stable
 for compatibility. The website and app do not share accounts. See [Privacy](docs/PRIVACY.md)
-and [Security](SECURITY.md).
+and [Security](SECURITY.md). Website-only visitor measurement is documented in [Analytics](docs/ANALYTICS.md);
+it does not measure app activity or installations.
 
 ## Development and contributions
 

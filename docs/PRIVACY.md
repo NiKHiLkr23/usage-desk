@@ -1,7 +1,7 @@
 # Privacy
 
-Usage Desk has no hosted account system, telemetry, analytics, or crash-upload service.
-The app and landing page do not collect accounts for the maintainer.
+The native Usage Desk app has no hosted account system, telemetry, analytics, or crash-upload service.
+The website has separate, cookie-free aggregate analytics; it never receives accounts from the app.
 
 ## What the app reads
 
@@ -31,6 +31,13 @@ sensitive authorization parameters—do not share it. The local callback is owne
 Usage Desk does not run model turns or consume earned resets.
 
 The static website uses your browser's localStorage only for an optional theme preference.
+Production-only Vercel Web Analytics can count aggregate visits and referrers after activation and
+deployment. Its before-send hook removes query strings/fragments from page URLs and limits paths to
+the public pages. Localhost, preview domains, Do Not Track and Global Privacy Control are excluded.
+Custom events are disabled by default pending plan verification. If enabled, they send only fixed
+event names and a hero/footer placement for successful command copies, never clipboard contents or
+account data. The installer does not report success, and the app does not report active users.
+See `docs/ANALYTICS.md` for activation and measurement limits.
 A hosting provider may process ordinary access logs under its own policy. Release downloads
 from GitHub are subject to GitHub's policies. The local preview does not contact GitHub or OpenAI.
 

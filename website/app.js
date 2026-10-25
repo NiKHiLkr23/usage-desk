@@ -34,6 +34,8 @@ for (const block of document.querySelectorAll('[data-install-block]')) {
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
       await navigator.clipboard.writeText(code.textContent.trim());
+      const placement = { 'install-command-hero': 'hero', 'install-command-footer': 'footer' }[code.id];
+      if (placement) document.dispatchEvent(new CustomEvent('usage-desk:install-command-copied', { detail: { placement } }));
       button.dataset.copied = '';
       label.textContent = 'Copied';
       feedback.textContent = 'Install command copied.';

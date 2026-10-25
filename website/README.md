@@ -1,6 +1,7 @@
 # Usage Desk landing page
 
-Buildless HTML, CSS, and JavaScript. No framework, external fonts, analytics, or runtime dependencies.
+Buildless HTML, CSS, and JavaScript. No framework, external fonts, or runtime package dependencies. Production-only Vercel Web Analytics
+is isolated from the native app; see [analytics setup](../docs/ANALYTICS.md).
 The hero uses native captures rendered from the actual SwiftUI app views with isolated sample accounts.
 No hand-built or AI-generated product mockups are used. The caption discloses sample data; the presentation-only Demo badge is omitted from captures.
 All links and interactions must remain usable with keyboard and reduced motion.
@@ -11,7 +12,7 @@ All links and interactions must remain usable with keyboard and reduced motion.
 npm run preview
 ```
 
-The server binds only `127.0.0.1:4320`; set `PORT` to change the port. It serves only `website/`.
+The server binds only `127.0.0.1:4320`; set `PORT` to change the port. It serves only `website/`. Analytics never loads on localhost.
 Run `node scripts/check-website.mjs` for structural, SEO, link, and privacy checks.
 The preview reads production security headers from `vercel.json` and serves the real 404 page.
 Vercel hostname redirects must be checked on the deployed site. Native app tests are separate.

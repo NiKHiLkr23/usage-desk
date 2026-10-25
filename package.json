@@ -13,7 +13,8 @@
     "assets": "node scripts/generate-assets.mjs",
     "version:check": "node scripts/version.mjs --check",
     "release:prepare": "node scripts/prepare-release.mjs",
-    "release:check": "node scripts/check-release.mjs"
+    "release:check": "node scripts/check-release.mjs",
+    "analytics:check": "node scripts/check-analytics.mjs"
   },
   "devDependencies": {
     "sharp": "0.35.5"

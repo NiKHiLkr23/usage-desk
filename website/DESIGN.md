@@ -21,7 +21,8 @@ fully rounded; command fields and the app frame use softer rectangular corners.
   Copy exactly the command, excluding the prompt. Keep the button width stable as its label
   changes to Copied. Clipboard denial selects the command and gives visible recovery guidance.
 - GitHub star: ordinary repository link with an outlined star. No automatic starring, fake
-  counts, runtime third-party requests, or new analytics.
+  counts, or automatic GitHub API requests. Production-only, cookie-free Vercel analytics is a
+  separate approved measurement layer; no app/account telemetry.
 - Product tabs: Usage, Accounts, Resets. Use actual `DeskRootView`/`DashboardView` renders
   with `AccountStore(demo: true)`; omit the presentation-only Demo badge from captures
   and disclose sample account data in the caption. Keep all demo safety guards active.
