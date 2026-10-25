@@ -162,7 +162,7 @@
     const label = get('[data-preview-label]').value.trim();
     if (!label || label.length > 80 || /[\u0000-\u001f\u007f]/.test(label)) { get('[data-name-feedback]').textContent = 'Enter a name of up to 80 characters.'; return; }
     labels.set(state.detail, label); drafts.delete(state.detail); render(); get('[data-save-name]').textContent = 'Saved';
-    get('[data-name-feedback]').textContent = 'Display name saved for this preview.';
+    get('[data-name-feedback]').textContent = 'Display name saved.';
     get('[data-preview-label]').focus({ preventScroll: true });
   });
   get('[data-menu-quota]').addEventListener('change', event => { state.showQuota = event.target.checked; get('[data-menu-title]').textContent = state.showQuota ? `${account().short}%` : 'usage desk'; });

@@ -2,8 +2,8 @@
 
 Buildless HTML, CSS, and JavaScript. No framework, external fonts, or runtime package dependencies. Production-only Vercel Web Analytics
 is isolated from the native app; see [analytics setup](../docs/ANALYTICS.md).
-The hero uses a native-style HTML/CSS/JS preview with isolated sample accounts. The caption
-identifies sample data. It never reads or connects real accounts. The public website contains no
+The hero uses a native-style HTML/CSS/JS preview with isolated sample accounts. Sample-data
+behavior is explained on the Privacy page; the hero has no preview caption. It never reads or connects real accounts. The public website contains no
 product screenshots; authentic repository screenshots remain separate.
 All links and interactions must remain usable with keyboard and reduced motion.
 

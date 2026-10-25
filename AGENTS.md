@@ -28,7 +28,7 @@ Reuse semantic colors and native component styles. Preserve System theme as defa
 Reduce Motion support, full-row account hit targets, and draft/login lifetime on dismissal.
 The Accounts tab is a compact selector; Manage/Add account expand the same panel.
 The original logo has one green first segment and two empty outlined segments.
-The website uses an HTML/CSS/JS app preview, explicitly approved on 2026-10-25. Match native tokens and interactions, disclose sample data, and keep it isolated from real accounts. Omit sign-in, Add account, removal, CLI paths, and OS-only controls. Theme controls share one System-first setting across the page and preview. Repository screenshots must remain real app captures with permanently redacted fields and stripped metadata; do not use generated product imagery.
+The website uses an HTML/CSS/JS app preview, explicitly approved on 2026-10-25. Match native tokens and interactions, explain sample data on the Privacy page, and keep it isolated from real accounts. Keep preview/sample captions out of the hero. Omit sign-in, Add account, removal, CLI paths, and OS-only controls. Theme controls share one System-first setting across the page and preview. Repository screenshots must remain real app captures with permanently redacted fields and stripped metadata; do not use generated product imagery.
 
 Follow the current user's publication instructions. The maintainer approved the initial source
 commit, GitHub push, and website deployment on 2026-10-18. App binaries, signing credentials,

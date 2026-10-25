@@ -30,7 +30,8 @@ fully rounded; command fields and the app frame use softer rectangular corners.
   the viewed account. Editing display names is memory-only and gives Saved feedback.
   The menu-bar entry toggles the panel. No Add account, sign-in, reconnect, removal, Quit, CLI path,
   launch-at-login, or real provider calls are exposed. Preferences intentionally shows only previewable controls.
-  Caption: “Interactive preview · Sample data.” This is a reconstruction, not a native screenshot.
+  Keep the hero free of preview/sample captions. Explain sample data on the Privacy page.
+  The interface is a reconstruction, not a native screenshot.
   Keep Usage readable without JavaScript. Fixed panel height prevents layout shifts on page navigation.
 - Keep the full install instructions near the bottom, with the same copy behavior.
 - Footer: a spacious brand/headline block on the left, two link columns on the right,
