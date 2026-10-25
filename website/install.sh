@@ -176,15 +176,19 @@ main() {
 
     # Bump only after reviewing and testing a new source commit. Never execute a moving branch.
     source_commit=9366db3b03b1fde7513e1f317e66e454f6d866d2
+    source_version=0.1.0
     source_repository=https://github.com/NiKHiLkr23/usage-desk.git
     umask 077
     work_dir=$(mktemp -d "${TMPDIR:-/tmp}/usage-desk-install.XXXXXX")
     log_file=$(mktemp "${TMPDIR:-/tmp}/usage-desk-install-log.XXXXXX")
-    printf 'Usage Desk source commit: %s\n' "$source_commit" > "$log_file"
+    printf '  Installing Usage Desk %s from verified source.\n' "$source_version"
+    printf 'Usage Desk version: %s\nSource commit: %s\n' "$source_version" "$source_commit" > "$log_file"
     source_dir="$work_dir/source"
     mkdir "$source_dir"
     run_step 'Downloading source' 'Could not download the source from GitHub. Check your connection and try again.' download_source
     [ "$(git -C "$source_dir" rev-parse HEAD 2>> "$log_file")" = "$source_commit" ] || fail 'Downloaded source did not match the expected commit.'
+    downloaded_version=$(cat "$source_dir/VERSION" 2>> "$log_file") || fail 'Downloaded source is missing its version.'
+    [ "$downloaded_version" = "$source_version" ] || fail 'Downloaded source did not match the expected app version.'
 
     printf '\n  Building locally. This may take several minutes.\n'
     run_step 'Building Usage Desk' 'The build failed. Nothing was installed.' zsh "$source_dir/scripts/build.sh"
@@ -195,7 +199,7 @@ main() {
     created_app=
 
     printf '\n  %sReady.%s Installed: %s\n' "$bold" "$reset" "$app_path"
-    printf '  Requires the Codex CLI, signed in with your ChatGPT account.\n'
+    printf '  Connect Codex CLI (ChatGPT) or Claude Code CLI (Pro/Max) in Accounts.\n'
     show_setup_link
     offer_launch
     printf '\n'

@@ -8,7 +8,9 @@ import { spawnSync } from 'node:child_process';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const installer=await readFile(path.join(root,'website/install.sh'),'utf8');
 assert.equal(spawnSync('/bin/sh',['-n'],{input:installer}).status,0,'Installer must parse as POSIX sh');
-const commit='9366db3b03b1fde7513e1f317e66e454f6d866d2';
+const commit=installer.match(/source_commit=([a-f0-9]{40})/)?.[1];
+const version=installer.match(/source_version=(\d+\.\d+\.\d+)/)?.[1];
+assert.ok(commit&&version,'Installer must pin a commit and app version');
 const temp=await mkdtemp(path.join(tmpdir(),'usage-desk-installer-check-'));
 // All platform, build, signature, and network tools are synthetic. No real app is built or launched.
 const stub=`#!/bin/sh
@@ -22,9 +24,15 @@ case "\$name" in
  xcode-select) [ "\$TEST_CASE" != missing-toolchain ] ;;
  xcrun) if [ "\$TEST_CASE" = old-swift ]; then printf 'Apple Swift version 5.10\\n'; else printf 'Apple Swift version 6.0\\n'; fi ;;
  git)
+  fetch_dir=$2
   shift 2
   case "\$1" in
-   fetch) [ "\$TEST_CASE" != fetch-failed ] ;;
+   fetch)
+    [ "\$TEST_CASE" != fetch-failed ] || exit 1
+    if [ "\$TEST_CASE" != missing-version ]; then
+     if [ "\$TEST_CASE" = wrong-version ]; then printf '9.9.9\\n' > "\$fetch_dir/VERSION";
+     else printf '${version}\\n' > "\$fetch_dir/VERSION"; fi
+    fi ;;
    rev-parse) if [ "\$TEST_CASE" = wrong-commit ]; then printf 'wrong\\n'; else printf '${commit}\\n'; fi ;;
   esac ;;
  zsh)
@@ -53,7 +61,7 @@ try {
  for(const tool of ['open','uname','id','sw_vers','xcode-select','xcrun','git','zsh','codesign','ditto']){
   const file=path.join(bin,tool);await writeFile(file,stub);await chmod(file,0o755);
  }
- for(const scenario of ['success','unsupported-os','root','old-macos','missing-toolchain','old-swift','existing-app','existing-symlink','fetch-failed','wrong-commit','build-failed','bad-signature','copy-failed','installed-signature-failed','launch-yes','launch-no','launch-eof','launch-failed','no-color','dumb-terminal','hyperlinks']){
+ for(const scenario of ['success','unsupported-os','root','old-macos','missing-toolchain','old-swift','existing-app','existing-symlink','fetch-failed','wrong-commit','missing-version','wrong-version','build-failed','bad-signature','copy-failed','installed-signature-failed','launch-yes','launch-no','launch-eof','launch-failed','no-color','dumb-terminal','hyperlinks']){
   const base=path.join(temp,scenario);const home=path.join(base,'home with spaces');const scratch=path.join(base,'scratch');
   await mkdir(home,{recursive:true});await mkdir(scratch);const log=path.join(base,'tools.log');await writeFile(log,'');
   const app=path.join(home,'Applications','Usage desk.app');
@@ -79,6 +87,7 @@ try {
    assert.equal(await readFile(path.join(app,'Contents/MacOS/ResetDesk'),'utf8'),'synthetic app\n');
    assert.ok(calls.includes(`fetch -q --depth 1 origin ${commit}`));
    assert.ok(r.stdout.includes('Installed: '+app));
+   assert.ok(r.stdout.includes('Installing Usage Desk '+version));
   } else if(scenario==='existing-app'){
    assert.equal(await readFile(path.join(app,'keep'),'utf8'),'existing installation');
    assert.ok(!calls.includes('git '));
@@ -87,11 +96,11 @@ try {
    if(['copy-failed','installed-signature-failed'].includes(scenario))await assert.rejects(readdir(app),'Remove a failed partial installation');
   }
   if(['unsupported-os','root','old-macos','missing-toolchain','old-swift','existing-symlink'].includes(scenario))assert.ok(!calls.includes('git '),`${scenario}: must not fetch source`);
-  if(['fetch-failed','wrong-commit'].includes(scenario))assert.ok(!calls.includes('zsh '),`${scenario}: must not build unverified source`);
+  if(['fetch-failed','wrong-commit','missing-version','wrong-version'].includes(scenario))assert.ok(!calls.includes('zsh '),`${scenario}: must not build unverified source`);
   // Apple's python3 launcher may create this toolchain cache before the PTY driver starts.
   // It is not an installer-owned artifact; continue checking every other temporary file.
   const retained=(await readdir(scratch)).filter(name=>name!=='xcrun_db');
-  if(['fetch-failed','wrong-commit','build-failed','bad-signature','copy-failed','installed-signature-failed'].includes(scenario)){
+  if(['fetch-failed','wrong-commit','missing-version','wrong-version','build-failed','bad-signature','copy-failed','installed-signature-failed'].includes(scenario)){
    assert.equal(retained.length,1,`${scenario}: retain only the diagnostic log`);
    assert.ok(retained[0].startsWith('usage-desk-install-log.'));
    const logPath=path.join(scratch,retained[0]);

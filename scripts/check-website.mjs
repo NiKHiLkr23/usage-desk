@@ -26,7 +26,7 @@ assert.ok(html.includes('Actual macOS app · Sample account data.'));assert.ok(h
 execFileSync(process.execPath,['--check',path.join(site,'app.js')]);checks++;
 execFileSync(process.execPath,[path.join(root,'scripts/check-installer.mjs')],{stdio:'inherit'});checks++;
 assert.ok(html.includes('curl -fsSL https://usage-desk.nikhilkr.in/install.sh | sh'));checks++;
-const install=await read('install.sh');assert.match(install,/source_commit=[a-f0-9]{40}/);checks++;
+const install=await read('install.sh');assert.match(install,/source_commit=[a-f0-9]{40}/);assert.match(install,/source_version=\d+\.\d+\.\d+/);checks+=2;
 // Keep the production domain, crawler discovery, and share cards consistent.
 const origin='https://usage-desk.nikhilkr.in';
 const pages=new Map([['index.html','/'],['privacy.html','/privacy.html'],['brand.html','/brand.html']]);
